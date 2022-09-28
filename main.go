@@ -14,7 +14,7 @@ func (g *Game) Layout(outsideWidth int, outsideHeight int) (int, int) {
 func main() {
 
 	ebiten.SetWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT)
-	ebiten.SetWindowTitle("Hello, World!")
+	ebiten.SetWindowTitle("Revenge of the golang")
 	if err := ebiten.RunGame(InitalizeGame()); err != nil {
 		log.Fatal(err)
 	}
