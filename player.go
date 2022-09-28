@@ -32,42 +32,50 @@ func (player *Player) Draw(screen *ebiten.Image) {
 }
 
 func (player *Player) Update(input *Input) {
-	x, y := GetNewCoordinates(player, input)
+	updateDirections(player, input)
 
-	player.Move(x, y)
+	player.Move(player.x+int16(player.xDirection), player.y+int16(player.yDirection))
 }
 
-func GetNewCoordinates(player *Player, input *Input) (int16, int16) {
-	newPosX := player.x
-	newPosY := player.y
+func updateDirections(player *Player, input *Input) {
+	if !input.directionDown || !input.directionUp {
+		// Make sure to reset directions if no buttons are pressed
+		player.yDirection = 0
+	}
+	if !input.directionLeft || !input.directionRight {
+		// Make sure to reset directions if no buttons are pressed
+		player.xDirection = 0
+	}
 
 	if input.directionLeft {
 		if input.movingSlow {
-			newPosX -= playerSlowSpeed
+			player.xDirection = -playerSlowSpeed
 		} else {
-			newPosX -= playerFastSpeed
+			player.xDirection = -playerFastSpeed
 		}
 	} else if input.directionRight {
 		if input.movingSlow {
-			newPosX += playerSlowSpeed
+			player.xDirection = playerSlowSpeed
 		} else {
-			newPosX += playerFastSpeed
+			player.xDirection = playerFastSpeed
 		}
 	}
 	if input.directionUp {
 		if input.movingSlow {
-			newPosY -= playerSlowSpeed
+			player.yDirection = -playerSlowSpeed
 		} else {
-			newPosY -= playerFastSpeed
+			player.yDirection = -playerFastSpeed
 		}
 	} else if input.directionDown {
 		if input.movingSlow {
-			newPosY += playerSlowSpeed
+			player.yDirection = playerSlowSpeed
 		} else {
-			newPosY += playerFastSpeed
+			player.yDirection = playerFastSpeed
 		}
 	}
-	return newPosX, newPosY
+
+	// Make sure to reset directions if no buttons are pressed
+
 }
 
 func (player *Player) Move(x int16, y int16) {

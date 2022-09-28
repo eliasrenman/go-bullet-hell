@@ -61,7 +61,7 @@ func (iC InputController) translateKeyboardInput() *Input {
 		directionUp = false
 	}
 	// Make Sure to cancel out the input if both left and right is pressed
-	if directionUp && directionDown {
+	if directionLeft && directionRight {
 		directionLeft = false
 		directionRight = false
 	}
