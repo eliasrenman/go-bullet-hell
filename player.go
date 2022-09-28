@@ -15,12 +15,26 @@ type Player struct {
 	x          int16
 	yDirection int8
 	xDirection int8
+	showHitbox bool
 }
 
 func (player *Player) Draw(screen *ebiten.Image) {
+	player.drawPlayer(screen)
 
+	// Draw hitbox
+	if player.showHitbox {
+		x, y := float64(player.x)+float64(PLAYFIELD_OFFSET)+(25-4), float64(player.y)+float64(PLAYFIELD_OFFSET)+(25-4)
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(x, y)
+
+		screen.DrawImage(hitbox, op)
+	}
+}
+
+func (player *Player) drawPlayer(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(player.x)+float64(PLAYFIELD_OFFSET), float64(player.y)+float64(PLAYFIELD_OFFSET))
+	x, y := float64(player.x)+float64(PLAYFIELD_OFFSET), float64(player.y)+float64(PLAYFIELD_OFFSET)
+	op.GeoM.Translate(x, y)
 
 	if player.xDirection < 0 {
 		screen.DrawImage(playerLeftImage, op)
@@ -30,10 +44,13 @@ func (player *Player) Draw(screen *ebiten.Image) {
 	} else {
 		screen.DrawImage(playerForwardImage, op)
 	}
+
 }
 
 func (player *Player) Update(input *Input) {
 	player.updateDirections(input)
+
+	player.showHitbox = input.movingSlow
 
 	player.Move(player.x+int16(player.xDirection), player.y+int16(player.yDirection))
 }

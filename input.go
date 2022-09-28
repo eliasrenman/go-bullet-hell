@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -25,7 +23,7 @@ func (iC InputController) translateKeyboardInput() *Input {
 	directions := []int8{0, 0}
 	movingSlow := false
 	for _, key := range iC.keys {
-		fmt.Println(key)
+		// fmt.Println(key)
 		// Checks if the key pressed is within the bounds of the keybindings
 		if val, ok := keyboardBindings[key.String()]; ok {
 			// Switch case to check the inputs
