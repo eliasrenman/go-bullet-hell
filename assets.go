@@ -34,14 +34,15 @@ func InitalizeHitbox() *ebiten.Image {
 }
 
 func InitalizePlayerBullet() *ebiten.Image {
-	dc := gg.NewContext(hitboxDimension, hitboxDimension)
+	dc := gg.NewContext(regularBulletSize, regularBulletSize)
+	halfBulletSize := float64(regularBulletSize / 2)
+	grad := gg.NewRadialGradient(halfBulletSize, halfBulletSize, halfBulletSize, halfBulletSize, halfBulletSize, regularBulletSize*0.002)
 
-	grad := gg.NewRadialGradient(100, 100, 10, 100, 120, 80)
 	grad.AddColorStop(0, color.RGBA{140, 20, 252, 255})
 	grad.AddColorStop(1, color.RGBA{255, 255, 255, 255})
 
 	dc.SetFillStyle(grad)
-	dc.DrawCircle(regularBulletSize/2, regularBulletSize/2, regularBulletSize/2)
+	dc.DrawCircle(halfBulletSize, halfBulletSize, halfBulletSize)
 	dc.Fill()
 	return ebiten.NewImageFromImage(dc.Image())
 }
