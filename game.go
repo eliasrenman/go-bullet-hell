@@ -22,6 +22,9 @@ func (game Game) Draw(screen *ebiten.Image) {
 	op.GeoM.Translate(0, 0)
 	screen.DrawImage(backgroundImage, op)
 
+	// op.GeoM.Translate(150, 150)
+	// screen.DrawImage(playerBullet, op)
+
 	// Draw characters
 	game.player.Draw(screen)
 	// Draw bullets

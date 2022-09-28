@@ -11,6 +11,7 @@ const (
 const playerSlowSpeed int8 = 2
 const playerFastSpeed int8 = 4
 const hitboxDimension = 8
+const regularBulletSize = 20
 
 const (
 	LEFT  = "Left"

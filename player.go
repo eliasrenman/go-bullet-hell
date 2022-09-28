@@ -17,8 +17,7 @@ const (
 type Player struct {
 	y          int16
 	x          int16
-	yDirection int8
-	xDirection int8
+	input      *Input
 	showHitbox bool
 }
 
@@ -40,10 +39,10 @@ func (player *Player) drawPlayer(screen *ebiten.Image) {
 	x, y := float64(player.x)+float64(PLAYFIELD_OFFSET), float64(player.y)+float64(PLAYFIELD_OFFSET)
 	op.GeoM.Translate(x, y)
 
-	if player.xDirection < 0 {
+	if player.input.directions[0] < 0 {
 		screen.DrawImage(playerLeftImage, op)
 
-	} else if player.xDirection > 0 {
+	} else if player.input.directions[0] > 0 {
 		screen.DrawImage(playerRightImage, op)
 	} else {
 		screen.DrawImage(playerForwardImage, op)
@@ -52,41 +51,33 @@ func (player *Player) drawPlayer(screen *ebiten.Image) {
 }
 
 func (player *Player) Update(input *Input) {
-	player.updateDirections(input)
+	player.input = input
+	player.updateDirections()
 
 	player.showHitbox = input.movingSlow
 
-	player.Move(player.x+int16(player.xDirection), player.y+int16(player.yDirection))
+	player.Move(player.x, player.y)
 }
 
-func (player *Player) updateDirections(input *Input) {
-
-	if input.directions[0] == 0 {
-		// Make sure to reset directions if no buttons are pressed
-		player.xDirection = 0
-	}
-	if input.directions[1] == 0 {
-		// Make sure to reset directions if no y direction buttons are pressed
-		player.yDirection = 0
-	}
+func (player *Player) updateDirections() {
 
 	// Set the apporpriate delta depending on if the slow movement is enabled
-	delta := playerFastSpeed
-	if input.movingSlow {
-		delta = playerSlowSpeed
+	delta := int16(playerFastSpeed)
+	if player.input.movingSlow {
+		delta = int16(playerSlowSpeed)
 	}
 
 	// Check X direction
-	if input.directions[0] < 0 {
-		player.xDirection = -delta
-	} else if input.directions[0] > 0 {
-		player.xDirection = delta
+	if player.input.directions[0] < 0 {
+		player.x += -delta
+	} else if player.input.directions[0] > 0 {
+		player.x += delta
 	}
 	// Check Y Direction
-	if input.directions[1] < 0 {
-		player.yDirection = -delta
-	} else if input.directions[1] > 0 {
-		player.yDirection = delta
+	if player.input.directions[1] < 0 {
+		player.y += -delta
+	} else if player.input.directions[1] > 0 {
+		player.y += delta
 	}
 }
 
@@ -118,10 +109,8 @@ func (player *Player) Move(x int16, y int16) {
 
 func InitalizePlayer() *Player {
 	player := Player{
-		x:          0,
-		y:          0,
-		xDirection: 0,
-		yDirection: 0,
+		x: 0,
+		y: 0,
 	}
 	return &player
 }

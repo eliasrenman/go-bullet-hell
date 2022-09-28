@@ -1,6 +1,7 @@
 package main
 
 import (
+	"image/color"
 	_ "image/png"
 	"log"
 
@@ -21,12 +22,26 @@ func LoadImage(path string) *ebiten.Image {
 var (
 	backgroundImage *ebiten.Image = LoadImage("./data/bg/playfield.png")
 	hitbox          *ebiten.Image = InitalizeHitbox()
+	playerBullet    *ebiten.Image = InitalizePlayerBullet()
 )
 
 func InitalizeHitbox() *ebiten.Image {
 	dc := gg.NewContext(hitboxDimension, hitboxDimension)
 	dc.SetRGBA255(0, 255, 255, 255)
 	dc.DrawCircle(hitboxDimension/2, hitboxDimension/2, hitboxDimension/2)
+	dc.Fill()
+	return ebiten.NewImageFromImage(dc.Image())
+}
+
+func InitalizePlayerBullet() *ebiten.Image {
+	dc := gg.NewContext(hitboxDimension, hitboxDimension)
+
+	grad := gg.NewRadialGradient(100, 100, 10, 100, 120, 80)
+	grad.AddColorStop(0, color.RGBA{140, 20, 252, 255})
+	grad.AddColorStop(1, color.RGBA{255, 255, 255, 255})
+
+	dc.SetFillStyle(grad)
+	dc.DrawCircle(regularBulletSize/2, regularBulletSize/2, regularBulletSize/2)
 	dc.Fill()
 	return ebiten.NewImageFromImage(dc.Image())
 }
