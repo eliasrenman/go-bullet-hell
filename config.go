@@ -18,9 +18,13 @@ const (
 )
 
 var keyboardBindings = map[string]string{
-	"W":     UP,
-	"S":     DOWN,
-	"A":     LEFT,
-	"D":     RIGHT,
-	"Shift": SLOW,
+	"W":          UP,
+	"S":          DOWN,
+	"A":          LEFT,
+	"D":          RIGHT,
+	"ArrowUp":    UP,
+	"ArrowDown":  DOWN,
+	"ArrowLeft":  LEFT,
+	"ArrowRight": RIGHT,
+	"Shift":      SLOW,
 }
