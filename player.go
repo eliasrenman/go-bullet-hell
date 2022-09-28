@@ -26,7 +26,8 @@ func (player *Player) Draw(screen *ebiten.Image) {
 
 	// Draw hitbox
 	if player.input.movingSlow {
-		x, y := float64(*player.x)+float64(PLAYFIELD_OFFSET)+(playerSize/2-4), float64(*player.y)+float64(PLAYFIELD_OFFSET)+(playerSize/2-4)
+		hitboxOffset := int16(playerSize/2 - hitboxDimension/2)
+		x, y := normalizeXCoord(*player.x+hitboxOffset), normalizeYCoord(*player.y+hitboxOffset)
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(x, y)
 
@@ -39,7 +40,7 @@ func (player *Player) Draw(screen *ebiten.Image) {
 
 func (player *Player) drawPlayer(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	x, y := float64(*player.x)+float64(PLAYFIELD_OFFSET), float64(*player.y)+float64(PLAYFIELD_OFFSET)
+	x, y := normalizeXCoord(*player.x), normalizeYCoord(*player.y)
 	op.GeoM.Translate(x, y)
 
 	if player.input.directions[0] < 0 {
@@ -118,12 +119,14 @@ func InitalizePlayer() *Player {
 		x: &x,
 		y: &y,
 		normalBullets: &Bullets{
-			framesPerBullet: regularBulletFramesPerBullet,
-			cooldown:        0,
-			image:           playerRegularBullet,
-			bulletSize:      regularBulletSize,
-			playerX:         &x,
-			playerY:         &y,
+			framesPerBullet:  regularBulletFramesPerBullet,
+			cooldown:         0,
+			image:            playerRegularBullet,
+			bulletSize:       regularBulletSize,
+			playerX:          &x,
+			playerY:          &y,
+			defaultDirection: []int8{0, -1},
+			defaultDelta:     regularBulletDelta,
 		},
 	}
 	return &player

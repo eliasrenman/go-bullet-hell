@@ -5,20 +5,22 @@ import (
 )
 
 type Bullets struct {
-	playerX         *int16
-	playerY         *int16
-	bullets         []*Bullet
-	framesPerBullet uint8
-	cooldown        uint8
-	image           *ebiten.Image
-	bulletSize      uint8
+	playerX          *int16
+	playerY          *int16
+	bullets          []*Bullet
+	framesPerBullet  uint8
+	cooldown         uint8
+	image            *ebiten.Image
+	bulletSize       uint8
+	defaultDirection []int8
+	defaultDelta     int16
 }
 
 func (bullets *Bullets) Draw(screen *ebiten.Image) {
 	for _, bullet := range bullets.bullets {
 
-		x, y := float64(bullet.x)+float64(PLAYFIELD_OFFSET)+float64(bullets.bulletSize/2), float64(bullet.y)+float64(PLAYFIELD_OFFSET)+float64(bullets.bulletSize/2)
-
+		x := normalizeXCoord(bullet.x + playerSize/2 - int16(bullets.bulletSize/2))
+		y := float64(bullet.y) + float64(PLAYFIELD_OFFSET) + float64(bullets.bulletSize/2)
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(x, y)
 		screen.DrawImage(bullets.image, op)
@@ -50,7 +52,9 @@ func (bullets *Bullets) Update(input *Input) {
 		bullets.bullets = append(bullets.bullets, &Bullet{
 			x:          *bullets.playerX,
 			y:          *bullets.playerY,
-			directions: []int8{0, -1},
+			directions: bullets.defaultDirection,
+			size:       bullets.bulletSize,
+			delta:      bullets.defaultDelta,
 		})
 		bullets.cooldown = bullets.framesPerBullet
 	}
@@ -66,6 +70,8 @@ type Bullet struct {
 	x          int16
 	y          int16
 	directions []int8
+	size       uint8
+	delta      int16
 }
 
 func (bullet *Bullet) Update() {
@@ -75,7 +81,7 @@ func (bullet *Bullet) Update() {
 func (bullet *Bullet) updateLocation() {
 
 	// Set the apporpriate delta depending on if the slow movement is enabled
-	var delta int16 = regularBulletSpeed
+	var delta int16 = int16(bullet.delta)
 
 	// Check X direction
 	if bullet.directions[0] < 0 {
@@ -93,5 +99,8 @@ func (bullet *Bullet) updateLocation() {
 
 func (bullet *Bullet) isOutOfBounds() bool {
 	// Check if bullet is outside of the bounds
-	return bullet.x < 0 || bullet.y < 0 || bullet.x > PLAYFIELD_X_MAX || bullet.y > PLAYFIELD_Y_MAX
+	return bullet.x < -int16(bullet.size) ||
+		bullet.y < -int16(bullet.size) ||
+		bullet.x >= PLAYFIELD_X_MAX+int16(bullet.size) ||
+		bullet.y >= PLAYFIELD_Y_MAX+int16(bullet.size)
 }

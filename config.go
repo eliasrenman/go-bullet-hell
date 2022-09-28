@@ -17,8 +17,8 @@ const hitboxDimension = 8
 
 // Regular player Bullets
 const regularBulletSize = 8
-const regularBulletFramesPerBullet = 24
-const regularBulletSpeed = 4
+const regularBulletFramesPerBullet = 6
+const regularBulletDelta = 4
 
 const (
 	LEFT        = "Left"

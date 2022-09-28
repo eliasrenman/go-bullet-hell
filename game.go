@@ -41,3 +41,10 @@ func (game Game) Update() error {
 	// Return no error
 	return nil
 }
+
+func normalizeXCoord(x int16) float64 {
+	return float64(x) + float64(PLAYFIELD_OFFSET)
+}
+func normalizeYCoord(y int16) float64 {
+	return float64(y) + float64(PLAYFIELD_OFFSET)
+}
