@@ -25,7 +25,7 @@ var (
 
 func InitalizeHitbox() *ebiten.Image {
 	dc := gg.NewContext(hitboxDimension, hitboxDimension)
-	dc.SetRGB255(255, 0, 0)
+	dc.SetRGBA255(0, 255, 255, 255)
 	dc.DrawCircle(hitboxDimension/2, hitboxDimension/2, hitboxDimension/2)
 	dc.Fill()
 	return ebiten.NewImageFromImage(dc.Image())
