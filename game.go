@@ -1,6 +1,9 @@
 package main
 
-import "github.com/hajimehoshi/ebiten/v2"
+import (
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
+)
 
 type Game struct {
 	player *Player
@@ -24,9 +27,13 @@ func (game Game) Draw(screen *ebiten.Image) {
 	// Draw bullets
 }
 func (game Game) Update() error {
+	//Append the keys
+	gameInput.keys = inpututil.AppendPressedKeys(gameInput.keys[:0])
 
+	// get gameInput
+	input := gameInput.TranslateInput()
 	// update characters
-	game.player.Update()
+	game.player.Update(input)
 	// update bullets
 	// Return no error
 	return nil

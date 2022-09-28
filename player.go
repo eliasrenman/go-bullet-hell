@@ -31,8 +31,43 @@ func (player *Player) Draw(screen *ebiten.Image) {
 	}
 }
 
-func (player *Player) Update() {
-	player.Move(player.x+int16(player.xDirection), int16(player.yDirection))
+func (player *Player) Update(input *Input) {
+	x, y := GetNewCoordinates(player, input)
+
+	player.Move(x, y)
+}
+
+func GetNewCoordinates(player *Player, input *Input) (int16, int16) {
+	newPosX := player.x
+	newPosY := player.y
+
+	if input.directionLeft {
+		if input.movingSlow {
+			newPosX -= playerSlowSpeed
+		} else {
+			newPosX -= playerFastSpeed
+		}
+	} else if input.directionRight {
+		if input.movingSlow {
+			newPosX += playerSlowSpeed
+		} else {
+			newPosX += playerFastSpeed
+		}
+	}
+	if input.directionUp {
+		if input.movingSlow {
+			newPosY -= playerSlowSpeed
+		} else {
+			newPosY -= playerFastSpeed
+		}
+	} else if input.directionDown {
+		if input.movingSlow {
+			newPosY += playerSlowSpeed
+		} else {
+			newPosY += playerFastSpeed
+		}
+	}
+	return newPosX, newPosY
 }
 
 func (player *Player) Move(x int16, y int16) {
