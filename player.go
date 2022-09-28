@@ -32,46 +32,39 @@ func (player *Player) Draw(screen *ebiten.Image) {
 }
 
 func (player *Player) Update(input *Input) {
-	updateDirections(player, input)
+	player.updateDirections(input)
 
 	player.Move(player.x+int16(player.xDirection), player.y+int16(player.yDirection))
 }
 
-func updateDirections(player *Player, input *Input) {
-	if !input.directionDown || !input.directionUp {
+func (player *Player) updateDirections(input *Input) {
+
+	if input.directions[1] == 0 {
 		// Make sure to reset directions if no buttons are pressed
 		player.yDirection = 0
 	}
-	if !input.directionLeft || !input.directionRight {
+	if input.directions[0] == 0 {
 		// Make sure to reset directions if no buttons are pressed
 		player.xDirection = 0
 	}
 
-	if input.directionLeft {
-		if input.movingSlow {
-			player.xDirection = -playerSlowSpeed
-		} else {
-			player.xDirection = -playerFastSpeed
-		}
-	} else if input.directionRight {
-		if input.movingSlow {
-			player.xDirection = playerSlowSpeed
-		} else {
-			player.xDirection = playerFastSpeed
-		}
+	// Set the apporpriate delta depending on if the slow movement is enabled
+	delta := playerFastSpeed
+	if input.movingSlow {
+		delta = playerSlowSpeed
 	}
-	if input.directionUp {
-		if input.movingSlow {
-			player.yDirection = -playerSlowSpeed
-		} else {
-			player.yDirection = -playerFastSpeed
-		}
-	} else if input.directionDown {
-		if input.movingSlow {
-			player.yDirection = playerSlowSpeed
-		} else {
-			player.yDirection = playerFastSpeed
-		}
+
+	// Check X direction
+	if input.directions[0] < 0 {
+		player.xDirection = -delta
+	} else if input.directions[0] > 0 {
+		player.xDirection = delta
+	}
+	// Check Y Direction
+	if input.directions[1] < 0 {
+		player.yDirection = -delta
+	} else if input.directions[1] > 0 {
+		player.yDirection = delta
 	}
 
 	// Make sure to reset directions if no buttons are pressed

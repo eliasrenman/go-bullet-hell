@@ -5,8 +5,8 @@ const (
 	screenHeight = 700
 )
 
-const playerSlowSpeed = 2
-const playerFastSpeed = 4
+const playerSlowSpeed int8 = 2
+const playerFastSpeed int8 = 4
 
 const (
 	Left  = "Left"

@@ -6,10 +6,7 @@ import (
 
 type Input struct {
 	movingSlow         bool
-	directionLeft      bool
-	directionRight     bool
-	directionUp        bool
-	directionDown      bool
+	directions         []int8
 	shootingMainGun    bool
 	shootingSpecialGun bool
 	guarding           bool
@@ -23,7 +20,7 @@ func (iC InputController) TranslateInput() *Input {
 	return iC.translateKeyboardInput()
 }
 func (iC InputController) translateKeyboardInput() *Input {
-	var directionLeft, directionRight, directionUp, directionDown = false, false, false, false
+	directions := []int8{0, 0}
 
 	for _, key := range iC.keys {
 		// Checks if the key pressed is within the bounds of the keybindings
@@ -32,22 +29,22 @@ func (iC InputController) translateKeyboardInput() *Input {
 			switch val {
 			case Left:
 				{
-					directionLeft = true
+					directions[0] += -1
 					break
 				}
 			case Right:
 				{
-					directionRight = true
+					directions[0] += 1
 					break
 				}
 			case Up:
 				{
-					directionUp = true
+					directions[1] += -1
 					break
 				}
 			case Down:
 				{
-					directionDown = true
+					directions[1] += 1
 					break
 				}
 			}
@@ -55,23 +52,9 @@ func (iC InputController) translateKeyboardInput() *Input {
 		}
 	}
 
-	// Make Sure to cancel out the input if both up and down is pressed
-	if directionUp && directionDown {
-		directionDown = false
-		directionUp = false
-	}
-	// Make Sure to cancel out the input if both left and right is pressed
-	if directionLeft && directionRight {
-		directionLeft = false
-		directionRight = false
-	}
-
 	return &Input{
 		movingSlow:         false,
-		directionLeft:      directionLeft,
-		directionRight:     directionRight,
-		directionUp:        directionUp,
-		directionDown:      directionDown,
+		directions:         directions,
 		shootingMainGun:    false,
 		shootingSpecialGun: false,
 		guarding:           false,
