@@ -7,8 +7,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
-type Game struct{}
-
 func (g *Game) Update() error {
 	return nil
 }
