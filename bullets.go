@@ -27,7 +27,9 @@ func (bullets *Bullets) Draw(screen *ebiten.Image) {
 
 func (bullets *Bullets) Update(input *Input) {
 	i := 0 // output index
+	// create a zero-length slice with the same underlying array
 
+	tmp := bullets.bullets[:0]
 	for _, bullet := range bullets.bullets {
 		// Update location of existing bullet(s)
 		bullet.Update()
@@ -36,15 +38,12 @@ func (bullets *Bullets) Update(input *Input) {
 			// copy and increment index
 			// bullets.bullets[i] = bullet
 			i++
+			tmp = append(tmp, bullet)
 
 		}
 	}
-	// Prevent memory leak by erasing truncated values
-	// (not needed if values don't contain pointers, directly or indirectly)
-	for j := i; j < len(bullets.bullets); j++ {
-		bullets.bullets[j] = nil
-	}
-	bullets.bullets = bullets.bullets[:i]
+
+	bullets.bullets = tmp
 
 	// Check if we should add new bullets
 	if bullets.cooldown == 0 && input.shootingRegularGun {
