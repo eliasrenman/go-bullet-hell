@@ -17,7 +17,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.DrawImage(backgroundImage, op)
 
 	// Draw characters
-
+	g.player.draw(screen)
 	// Draw bullets
 }
 
@@ -30,7 +30,7 @@ func main() {
 
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Hello, World!")
-	if err := ebiten.RunGame(&Game{}); err != nil {
+	if err := ebiten.RunGame(InitalizeGame()); err != nil {
 		log.Fatal(err)
 	}
 }
