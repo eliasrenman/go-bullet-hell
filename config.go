@@ -4,6 +4,8 @@ const (
 	SCREEN_WIDTH     int   = 900
 	SCREEN_HEIGHT    int   = 700
 	PLAYFIELD_OFFSET uint8 = 50
+	PLAYFIELD_X_MAX        = 350
+	PLAYFIELD_Y_MAX        = 550
 )
 
 const playerSlowSpeed int8 = 2

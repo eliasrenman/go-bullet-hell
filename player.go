@@ -10,6 +10,10 @@ var (
 	playerRightImage   *ebiten.Image = LoadImage("./data/characters/player_right.png")
 )
 
+const (
+	playerSize = 50
+)
+
 type Player struct {
 	y          int16
 	x          int16
@@ -57,13 +61,13 @@ func (player *Player) Update(input *Input) {
 
 func (player *Player) updateDirections(input *Input) {
 
-	if input.directions[1] == 0 {
-		// Make sure to reset directions if no buttons are pressed
-		player.yDirection = 0
-	}
 	if input.directions[0] == 0 {
 		// Make sure to reset directions if no buttons are pressed
 		player.xDirection = 0
+	}
+	if input.directions[1] == 0 {
+		// Make sure to reset directions if no y direction buttons are pressed
+		player.yDirection = 0
 	}
 
 	// Set the apporpriate delta depending on if the slow movement is enabled
@@ -84,9 +88,6 @@ func (player *Player) updateDirections(input *Input) {
 	} else if input.directions[1] > 0 {
 		player.yDirection = delta
 	}
-
-	// Make sure to reset directions if no buttons are pressed
-
 }
 
 func (player *Player) Move(x int16, y int16) {
@@ -94,18 +95,25 @@ func (player *Player) Move(x int16, y int16) {
 	player.x = x
 	player.y = y
 
-	if player.y <= -25 {
-		player.y = -25
-	} else if player.y >= 575 {
-		player.y = 575
+	const halfPlayerSize = int16(playerSize / 2)
+
+	const maxX = PLAYFIELD_X_MAX + halfPlayerSize
+
+	// Limit the player from going out of bound on the x axis
+	if player.x <= -halfPlayerSize {
+		player.x = -halfPlayerSize
+	} else if player.x >= maxX {
+		player.x = maxX
 	}
 
-	if player.x <= -25 {
-		player.x = -25
-	} else if player.x >= 375 {
-		player.x = 375
-	}
+	const maxY = PLAYFIELD_Y_MAX + halfPlayerSize
 
+	// Limit the player from going out of bound on the y axis
+	if player.y <= -halfPlayerSize {
+		player.y = -halfPlayerSize
+	} else if player.y >= maxY {
+		player.y = maxY
+	}
 }
 
 func InitalizePlayer() *Player {
