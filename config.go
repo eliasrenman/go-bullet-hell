@@ -1,9 +1,9 @@
 package main
 
 const (
-	SCREEN_WIDTH     uint16 = 900
-	SCREEN_HEIGHT    uint16 = 700
-	PLAYFIELD_OFFSET uint8  = 50
+	SCREEN_WIDTH     int   = 900
+	SCREEN_HEIGHT    int   = 700
+	PLAYFIELD_OFFSET uint8 = 50
 )
 
 const playerSlowSpeed int8 = 2

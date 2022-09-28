@@ -20,7 +20,7 @@ type Player struct {
 func (player *Player) Draw(screen *ebiten.Image) {
 
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(player.x)+PLAYFIELD_OFFSET, float64(player.y)+PLAYFIELD_OFFSET)
+	op.GeoM.Translate(float64(player.x)+float64(PLAYFIELD_OFFSET), float64(player.y)+float64(PLAYFIELD_OFFSET))
 
 	if player.xDirection < 0 {
 		screen.DrawImage(playerLeftImage, op)
