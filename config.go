@@ -1,23 +1,26 @@
 package main
 
 const (
-	screenWidth  = 900
-	screenHeight = 700
+	SCREEN_WIDTH     uint16 = 900
+	SCREEN_HEIGHT    uint16 = 700
+	PLAYFIELD_OFFSET uint8  = 50
 )
 
 const playerSlowSpeed int8 = 2
 const playerFastSpeed int8 = 4
 
 const (
-	Left  = "Left"
-	Right = "Right"
-	Down  = "Down"
-	Up    = "Up"
+	LEFT  = "Left"
+	RIGHT = "Right"
+	DOWN  = "Down"
+	UP    = "Up"
+	SLOW  = "Slow"
 )
 
 var keyboardBindings = map[string]string{
-	"W": Up,
-	"S": Down,
-	"A": Left,
-	"D": Right,
+	"W":     UP,
+	"S":     DOWN,
+	"A":     LEFT,
+	"D":     RIGHT,
+	"Shift": SLOW,
 }

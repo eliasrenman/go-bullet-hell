@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -21,30 +23,36 @@ func (iC InputController) TranslateInput() *Input {
 }
 func (iC InputController) translateKeyboardInput() *Input {
 	directions := []int8{0, 0}
-
+	movingSlow := false
 	for _, key := range iC.keys {
+		fmt.Println(key)
 		// Checks if the key pressed is within the bounds of the keybindings
 		if val, ok := keyboardBindings[key.String()]; ok {
 			// Switch case to check the inputs
 			switch val {
-			case Left:
+			case LEFT:
 				{
 					directions[0] += -1
 					break
 				}
-			case Right:
+			case RIGHT:
 				{
 					directions[0] += 1
 					break
 				}
-			case Up:
+			case UP:
 				{
 					directions[1] += -1
 					break
 				}
-			case Down:
+			case DOWN:
 				{
 					directions[1] += 1
+					break
+				}
+			case SLOW:
+				{
+					movingSlow = true
 					break
 				}
 			}
@@ -53,7 +61,7 @@ func (iC InputController) translateKeyboardInput() *Input {
 	}
 
 	return &Input{
-		movingSlow:         false,
+		movingSlow:         movingSlow,
 		directions:         directions,
 		shootingMainGun:    false,
 		shootingSpecialGun: false,
