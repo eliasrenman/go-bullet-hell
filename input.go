@@ -7,7 +7,7 @@ import (
 type Input struct {
 	movingSlow         bool
 	directions         []int8
-	shootingMainGun    bool
+	shootingRegularGun bool
 	shootingSpecialGun bool
 	guarding           bool
 }
@@ -22,6 +22,7 @@ func (iC InputController) TranslateInput() *Input {
 func (iC InputController) translateKeyboardInput() *Input {
 	directions := []int8{0, 0}
 	movingSlow := false
+	shootingRegularGun := false
 	for _, key := range iC.keys {
 		// fmt.Println(key)
 		// Checks if the key pressed is within the bounds of the keybindings
@@ -53,6 +54,11 @@ func (iC InputController) translateKeyboardInput() *Input {
 					movingSlow = true
 					break
 				}
+			case REGULAR_GUN:
+				{
+					shootingRegularGun = true
+					break
+				}
 			}
 
 		}
@@ -61,7 +67,7 @@ func (iC InputController) translateKeyboardInput() *Input {
 	return &Input{
 		movingSlow:         movingSlow,
 		directions:         directions,
-		shootingMainGun:    false,
+		shootingRegularGun: shootingRegularGun,
 		shootingSpecialGun: false,
 		guarding:           false,
 	}

@@ -15,28 +15,31 @@ const (
 )
 
 type Player struct {
-	y          int16
-	x          int16
-	input      *Input
-	showHitbox bool
+	y             *int16
+	x             *int16
+	input         *Input
+	normalBullets *Bullets
 }
 
 func (player *Player) Draw(screen *ebiten.Image) {
 	player.drawPlayer(screen)
 
 	// Draw hitbox
-	if player.showHitbox {
-		x, y := float64(player.x)+float64(PLAYFIELD_OFFSET)+(25-4), float64(player.y)+float64(PLAYFIELD_OFFSET)+(25-4)
+	if player.input.movingSlow {
+		x, y := float64(*player.x)+float64(PLAYFIELD_OFFSET)+(playerSize/2-4), float64(*player.y)+float64(PLAYFIELD_OFFSET)+(playerSize/2-4)
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(x, y)
 
 		screen.DrawImage(hitbox, op)
 	}
+
+	// Draw regular bullets
+	player.normalBullets.Draw(screen)
 }
 
 func (player *Player) drawPlayer(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	x, y := float64(player.x)+float64(PLAYFIELD_OFFSET), float64(player.y)+float64(PLAYFIELD_OFFSET)
+	x, y := float64(*player.x)+float64(PLAYFIELD_OFFSET), float64(*player.y)+float64(PLAYFIELD_OFFSET)
 	op.GeoM.Translate(x, y)
 
 	if player.input.directions[0] < 0 {
@@ -52,65 +55,76 @@ func (player *Player) drawPlayer(screen *ebiten.Image) {
 
 func (player *Player) Update(input *Input) {
 	player.input = input
-	player.updateDirections()
+	player.updateLocation()
 
-	player.showHitbox = input.movingSlow
+	player.move(player.x, player.y)
 
-	player.Move(player.x, player.y)
+	player.normalBullets.Update(input)
 }
 
-func (player *Player) updateDirections() {
+func (player *Player) updateLocation() {
 
 	// Set the apporpriate delta depending on if the slow movement is enabled
-	delta := int16(playerFastSpeed)
+	delta := int16(playerFastDelta)
 	if player.input.movingSlow {
-		delta = int16(playerSlowSpeed)
+		delta = int16(playerSlowDelta)
 	}
 
 	// Check X direction
 	if player.input.directions[0] < 0 {
-		player.x += -delta
+		*player.x += -delta
 	} else if player.input.directions[0] > 0 {
-		player.x += delta
+		*player.x += delta
 	}
 	// Check Y Direction
 	if player.input.directions[1] < 0 {
-		player.y += -delta
+		*player.y += -delta
 	} else if player.input.directions[1] > 0 {
-		player.y += delta
+		*player.y += delta
 	}
 }
 
-func (player *Player) Move(x int16, y int16) {
-
-	player.x = x
-	player.y = y
+func (player *Player) move(x *int16, y *int16) {
+	playerX := *x
+	playerY := *y
 
 	const halfPlayerSize = int16(playerSize / 2)
 
 	const maxX = PLAYFIELD_X_MAX + halfPlayerSize
 
 	// Limit the player from going out of bound on the x axis
-	if player.x <= -halfPlayerSize {
-		player.x = -halfPlayerSize
-	} else if player.x >= maxX {
-		player.x = maxX
+	if playerX <= -halfPlayerSize {
+		playerX = -halfPlayerSize
+	} else if playerX >= maxX {
+		playerX = maxX
 	}
 
 	const maxY = PLAYFIELD_Y_MAX + halfPlayerSize
 
 	// Limit the player from going out of bound on the y axis
-	if player.y <= -halfPlayerSize {
-		player.y = -halfPlayerSize
-	} else if player.y >= maxY {
-		player.y = maxY
+	if playerY <= -halfPlayerSize {
+		playerY = -halfPlayerSize
+	} else if playerY >= maxY {
+		playerY = maxY
 	}
+
+	*player.x = playerX
+	*player.y = playerY
 }
 
 func InitalizePlayer() *Player {
+	var x, y int16 = 0, 0
 	player := Player{
-		x: 0,
-		y: 0,
+		x: &x,
+		y: &y,
+		normalBullets: &Bullets{
+			framesPerBullet: regularBulletFramesPerBullet,
+			cooldown:        0,
+			image:           playerRegularBullet,
+			bulletSize:      regularBulletSize,
+			playerX:         &x,
+			playerY:         &y,
+		},
 	}
 	return &player
 }

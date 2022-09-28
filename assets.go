@@ -20,9 +20,9 @@ func LoadImage(path string) *ebiten.Image {
 }
 
 var (
-	backgroundImage *ebiten.Image = LoadImage("./data/bg/playfield.png")
-	hitbox          *ebiten.Image = InitalizeHitbox()
-	playerBullet    *ebiten.Image = InitalizePlayerBullet()
+	backgroundImage     *ebiten.Image = LoadImage("./data/bg/playfield.png")
+	hitbox              *ebiten.Image = InitalizeHitbox()
+	playerRegularBullet *ebiten.Image = InitalizePlayerBullet()
 )
 
 func InitalizeHitbox() *ebiten.Image {

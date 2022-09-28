@@ -8,17 +8,25 @@ const (
 	PLAYFIELD_Y_MAX        = 550
 )
 
-const playerSlowSpeed int8 = 2
-const playerFastSpeed int8 = 4
+// Player speeds
+const playerSlowDelta int8 = 2
+const playerFastDelta int8 = 4
+
+// Player hitbox
 const hitboxDimension = 8
+
+// Regular player Bullets
 const regularBulletSize = 8
+const regularBulletFramesPerBullet = 24
+const regularBulletSpeed = 4
 
 const (
-	LEFT  = "Left"
-	RIGHT = "Right"
-	DOWN  = "Down"
-	UP    = "Up"
-	SLOW  = "Slow"
+	LEFT        = "Left"
+	RIGHT       = "Right"
+	DOWN        = "Down"
+	UP          = "Up"
+	SLOW        = "Slow"
+	REGULAR_GUN = "REGULAR_GUN"
 )
 
 var keyboardBindings = map[string]string{
@@ -31,4 +39,5 @@ var keyboardBindings = map[string]string{
 	"ArrowLeft":  LEFT,
 	"ArrowRight": RIGHT,
 	"Shift":      SLOW,
+	"Z":          REGULAR_GUN,
 }
