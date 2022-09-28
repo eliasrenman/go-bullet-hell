@@ -114,7 +114,7 @@ func (player *Player) move(x *int16, y *int16) {
 }
 
 func InitalizePlayer() *Player {
-	var x, y int16 = 0, 0
+	var x, y int16 = INITAL_PLAYER_X, INITAL_PLAYER_Y
 	player := Player{
 		x: &x,
 		y: &y,

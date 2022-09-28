@@ -6,6 +6,8 @@ const (
 	PLAYFIELD_OFFSET uint8 = 50
 	PLAYFIELD_X_MAX        = 350
 	PLAYFIELD_Y_MAX        = 550
+	INITAL_PLAYER_X        = (PLAYFIELD_X_MAX / 2)
+	INITAL_PLAYER_Y        = (PLAYFIELD_Y_MAX / 5) * 4
 )
 
 // Player speeds
