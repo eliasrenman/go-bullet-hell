@@ -43,3 +43,19 @@ var keyboardBindings = map[string]string{
 	"Shift":      SLOW,
 	"Z":          REGULAR_GUN,
 }
+
+var controllerBindings = map[string]string{
+	// "W":          UP,
+	// "S":          DOWN,
+	// "A":          LEFT,
+	// "D":          RIGHT,
+	"15": UP,
+	"17": DOWN,
+	"18": LEFT,
+	"16": RIGHT,
+	"6":  SLOW,
+	"7":  SLOW,
+	"8":  SLOW,
+	"9":  SLOW,
+	"0":  REGULAR_GUN,
+}

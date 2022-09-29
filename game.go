@@ -29,7 +29,7 @@ func (game Game) Draw(screen *ebiten.Image) {
 func (game Game) Update() error {
 	//Append the keys
 	gameInput.keys = inpututil.AppendPressedKeys(gameInput.keys[:0])
-
+	gameInput.Update()
 	// get gameInput
 	input := gameInput.TranslateInput()
 	// update characters

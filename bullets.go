@@ -100,8 +100,8 @@ func (bullet *Bullet) updateLocation() {
 func (bullet *Bullet) isOutOfBounds() bool {
 	modifier := int16(bullet.size) + playerSize/2
 	// Check if bullet is outside of the bounds
-	return bullet.x < -playerSize/2 ||
-		bullet.y < -playerSize/2 ||
+	return bullet.x < -25 ||
+		bullet.y < -int16(bullet.size) ||
 		bullet.x > PLAYFIELD_X_MAX+modifier ||
 		bullet.y > PLAYFIELD_Y_MAX+modifier
 }
