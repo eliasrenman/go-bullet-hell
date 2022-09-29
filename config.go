@@ -6,7 +6,7 @@ const (
 	PLAYFIELD_OFFSET uint8 = 50
 	PLAYFIELD_X_MAX        = 350
 	PLAYFIELD_Y_MAX        = 550
-	INITAL_PLAYER_X        = (PLAYFIELD_X_MAX / 2)
+	INITAL_PLAYER_X        = (PLAYFIELD_X_MAX / 2) - playerSize/4
 	INITAL_PLAYER_Y        = (PLAYFIELD_Y_MAX / 5) * 4
 )
 
@@ -19,8 +19,8 @@ const hitboxDimension = 8
 
 // Regular player Bullets
 const regularBulletSize = 8
-const regularBulletFramesPerBullet = 6
-const regularBulletDelta = 4
+const regularBulletFramesPerBullet = 5
+const regularBulletDelta = 6
 
 const (
 	LEFT        = "Left"
