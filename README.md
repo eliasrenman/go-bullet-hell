@@ -9,6 +9,7 @@ Here is a list of the modules needed for my game
 
 * Button input
  - Keyboard completed
+ - Gamepad completed, in need of a cleanup
 * Animating
   - Player animations are done
 * Ai
