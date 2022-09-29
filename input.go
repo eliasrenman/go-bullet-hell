@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -22,7 +21,7 @@ type InputController struct {
 	keys           []ebiten.Key
 	gamepadIDsBuf  []ebiten.GamepadID
 	gamepadIDs     map[ebiten.GamepadID]struct{}
-	axes           map[ebiten.GamepadID][]string
+	axes           map[ebiten.GamepadID][]float32
 	pressedButtons map[ebiten.GamepadID][]string
 	gamepadActive  bool
 }
@@ -67,6 +66,27 @@ func (iC InputController) translateControllerInput() *Input {
 	directions := []int8{0, 0}
 	movingSlow := false
 	shootingRegularGun := false
+	// Check for each gamepad
+	for _, axis := range iC.axes {
+		if len(axis) > 0 {
+			// Check axis for x direction
+			xAxis := float32(axis[0])
+			if xAxis > CONTROLLER_DEADZONE {
+				directions[0] = 1
+			} else if xAxis < -CONTROLLER_DEADZONE {
+				directions[0] = -1
+			}
+
+			// Check axis for y direction
+			yAxis := float32(axis[1])
+
+			if yAxis > CONTROLLER_DEADZONE {
+				directions[1] = 1
+			} else if yAxis < -CONTROLLER_DEADZONE {
+				directions[1] = -1
+			}
+		}
+	}
 
 	// Check for each gamepad
 	for _, buttons := range iC.pressedButtons {
@@ -146,13 +166,18 @@ func (g *InputController) Update() error {
 		}
 	}
 
-	g.axes = map[ebiten.GamepadID][]string{}
+	g.axes = map[ebiten.GamepadID][]float32{}
 	g.pressedButtons = map[ebiten.GamepadID][]string{}
 	for id := range g.gamepadIDs {
 		maxAxis := ebiten.GamepadAxisCount(id)
 		for a := 0; a < maxAxis; a++ {
 			v := ebiten.GamepadAxisValue(id, a)
-			g.axes[id] = append(g.axes[id], fmt.Sprintf("%d:%+0.2f", a, v))
+
+			// sets the gamePad to active
+			if v != 0 {
+				g.gamepadActive = true
+			}
+			g.axes[id] = append(g.axes[id], float32(v))
 		}
 
 		maxButton := ebiten.GamepadButton(ebiten.GamepadButtonCount(id))
