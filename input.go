@@ -50,39 +50,7 @@ func (iC InputController) translateKeyboardInput() *Input {
 		// Checks if the key pressed is within the bounds of the keybindings
 		if val, ok := keyboardBindings[key.String()]; ok {
 			// Switch case to check the inputs
-			switch val {
-			case LEFT:
-				{
-					directions[0] += -1
-					break
-				}
-			case RIGHT:
-				{
-					directions[0] += 1
-					break
-				}
-			case UP:
-				{
-					directions[1] += -1
-					break
-				}
-			case DOWN:
-				{
-					directions[1] += 1
-					break
-				}
-			case SLOW:
-				{
-					movingSlow = true
-					break
-				}
-			case REGULAR_GUN:
-				{
-					shootingRegularGun = true
-					break
-				}
-			}
-
+			directions, movingSlow, shootingRegularGun = translateButtonInputs(val, directions, movingSlow, shootingRegularGun)
 		}
 	}
 
@@ -96,48 +64,17 @@ func (iC InputController) translateKeyboardInput() *Input {
 }
 
 func (iC InputController) translateControllerInput() *Input {
-
 	directions := []int8{0, 0}
 	movingSlow := false
 	shootingRegularGun := false
 
+	// Check for each gamepad
 	for _, buttons := range iC.pressedButtons {
-		// fmt.Println(buttons)
 		if len(buttons) > 0 {
 			for _, button := range buttons {
+				// This is potentionally a bad practice since it takes the last gamepad with input on it.
 				if val, ok := controllerBindings[button]; ok {
-					switch val {
-					case LEFT:
-						{
-							directions[0] += -1
-							break
-						}
-					case RIGHT:
-						{
-							directions[0] += 1
-							break
-						}
-					case UP:
-						{
-							directions[1] += -1
-							break
-						}
-					case DOWN:
-						{
-							directions[1] += 1
-							break
-						}
-					case SLOW:
-						{
-							movingSlow = true
-							break
-						}
-					case REGULAR_GUN:
-						{
-							shootingRegularGun = true
-							break
-						}
-					}
+					directions, movingSlow, shootingRegularGun = translateButtonInputs(val, directions, movingSlow, shootingRegularGun)
 				}
 			}
 		}
@@ -150,6 +87,44 @@ func (iC InputController) translateControllerInput() *Input {
 		shootingSpecialGun: false,
 		guarding:           false,
 	}
+}
+
+func translateButtonInputs(val string, directions []int8, movingSlow bool, shootingRegularGun bool) ([]int8, bool, bool) {
+
+	// Switch case to check the inputs
+	switch val {
+	case LEFT:
+		{
+			directions[0] += -1
+			break
+		}
+	case RIGHT:
+		{
+			directions[0] += 1
+			break
+		}
+	case UP:
+		{
+			directions[1] += -1
+			break
+		}
+	case DOWN:
+		{
+			directions[1] += 1
+			break
+		}
+	case SLOW:
+		{
+			movingSlow = true
+			break
+		}
+	case REGULAR_GUN:
+		{
+			shootingRegularGun = true
+			break
+		}
+	}
+	return directions, movingSlow, shootingRegularGun
 }
 
 func (g *InputController) Update() error {
