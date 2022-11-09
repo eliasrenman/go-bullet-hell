@@ -1,26 +1,29 @@
 package main
 
 import (
+	"math"
+
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Bullets struct {
-	playerX          *int16
-	playerY          *int16
-	bullets          []*Bullet
+	playerX          int
+	playerY          int
+	bullets          []Bullet
 	framesPerBullet  uint8
 	cooldown         uint8
 	image            *ebiten.Image
-	bulletSize       uint8
+	bulletSize       uint
 	defaultDirection []int8
 	defaultDelta     int16
 }
 
 func (bullets *Bullets) Draw(screen *ebiten.Image) {
 	for _, bullet := range bullets.bullets {
+		x, y := normalizeCoords(bullet.x, bullet.y)
+		x -= float64(bullet.size / 2)
+		y -= float64(bullet.size / 2)
 
-		x := normalizeXCoord(bullet.x + playerSize/2 - int16(bullets.bulletSize/2))
-		y := float64(bullet.y) + float64(PLAYFIELD_OFFSET) + float64(bullets.bulletSize/2)
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(x, y)
 		screen.DrawImage(bullets.image, op)
@@ -49,13 +52,7 @@ func (bullets *Bullets) Update(input *Input) {
 
 	// Check if we should add new bullets
 	if bullets.cooldown == 0 && input.shootingRegularGun {
-		bullets.bullets = append(bullets.bullets, &Bullet{
-			x:          *bullets.playerX,
-			y:          *bullets.playerY,
-			directions: bullets.defaultDirection,
-			size:       bullets.bulletSize,
-			delta:      bullets.defaultDelta,
-		})
+		bullets.Spawn(bullets.playerX, bullets.playerY, bullets.bulletSize, 0, float64(bullets.defaultDelta))
 		bullets.cooldown = bullets.framesPerBullet
 	}
 	// And decrease cooldown if it is not already at 0
@@ -66,12 +63,25 @@ func (bullets *Bullets) Update(input *Input) {
 
 }
 
+func (bullets *Bullets) Spawn(x int, y int, size uint, direction float64, speed float64) {
+	velocity := [2]float64{
+		math.Cos(direction) * speed,
+		math.Sin(direction) * speed,
+	}
+
+	bullets.bullets = append(bullets.bullets, Bullet{
+		x:        x,
+		y:        y,
+		velocity: velocity,
+		size:     size,
+	})
+}
+
 type Bullet struct {
-	x          int16
-	y          int16
-	directions []int8
-	size       uint8
-	delta      int16
+	x        int
+	y        int
+	velocity [2]float64
+	size     uint
 }
 
 func (bullet *Bullet) Update() {
@@ -79,29 +89,13 @@ func (bullet *Bullet) Update() {
 }
 
 func (bullet *Bullet) updateLocation() {
-
-	// Set the apporpriate delta depending on if the slow movement is enabled
-	var delta int16 = int16(bullet.delta)
-
-	// Check X direction
-	if bullet.directions[0] < 0 {
-		bullet.x += -delta
-	} else if bullet.directions[0] > 0 {
-		bullet.x += delta
-	}
-	// Check Y Direction
-	if bullet.directions[1] < 0 {
-		bullet.y += -delta
-	} else if bullet.directions[1] > 0 {
-		bullet.y += delta
-	}
+	bullet.x += int(bullet.velocity[0])
+	bullet.y += int(bullet.velocity[1])
 }
 
 func (bullet *Bullet) isOutOfBounds() bool {
-	modifier := int16(bullet.size) + playerSize/2
-	// Check if bullet is outside of the bounds
-	return bullet.x < -25 ||
-		bullet.y < -int16(bullet.size) ||
-		bullet.x > PLAYFIELD_X_MAX+modifier ||
-		bullet.y > PLAYFIELD_Y_MAX+modifier
+	return bullet.x < -int(bullet.size) ||
+		bullet.y < -int(bullet.size) ||
+		bullet.x > PLAYFIELD_WIDTH ||
+		bullet.y > PLAYFIELD_HEIGHT
 }

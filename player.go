@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/eliasrenman/go-bullet-hell/util"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -15,19 +16,20 @@ const (
 )
 
 type Player struct {
-	y             *int16
-	x             *int16
-	input         *Input
-	normalBullets *Bullets
+	y          int
+	x          int
+	movingSlow bool
+	bullets    *Bullets
 }
 
 func (player *Player) Draw(screen *ebiten.Image) {
 	player.drawPlayer(screen)
 
 	// Draw hitbox
-	if player.input.movingSlow {
-		hitboxOffset := int16(playerSize/2 - hitboxDimension/2)
-		x, y := normalizeXCoord(*player.x+hitboxOffset), normalizeYCoord(*player.y+hitboxOffset)
+	if player.movingSlow {
+		hitboxOffset := playerSize/2 - hitboxDimension/2
+		x, y := normalizeCoords(player.x+hitboxOffset, player.y+hitboxOffset)
+
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(x, y)
 
@@ -35,96 +37,75 @@ func (player *Player) Draw(screen *ebiten.Image) {
 	}
 
 	// Draw regular bullets
-	player.normalBullets.Draw(screen)
+	player.bullets.Draw(screen)
 }
 
 func (player *Player) drawPlayer(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	x, y := normalizeXCoord(*player.x), normalizeYCoord(*player.y)
+	x, y := normalizeCoords(player.x, player.y)
 	op.GeoM.Translate(x, y)
 
-	if player.input.directions[0] < 0 {
-		screen.DrawImage(playerLeftImage, op)
-
-	} else if player.input.directions[0] > 0 {
-		screen.DrawImage(playerRightImage, op)
-	} else {
-		screen.DrawImage(playerForwardImage, op)
+	hInput := AXIS_HORIZONTAL.Get(0)
+	image := playerForwardImage
+	if hInput < 0 {
+		image = playerLeftImage
+	}
+	if hInput > 0 {
+		image = playerRightImage
 	}
 
+	screen.DrawImage(image, op)
 }
 
 func (player *Player) Update(input *Input) {
-	player.input = input
 	player.updateLocation()
-
 	player.move(player.x, player.y)
-
-	player.normalBullets.Update(input)
+	player.bullets.Update(input)
 }
 
 func (player *Player) updateLocation() {
-
-	// Set the apporpriate delta depending on if the slow movement is enabled
-	delta := int16(playerFastDelta)
-	if player.input.movingSlow {
-		delta = int16(playerSlowDelta)
+	// Set the apporpriate speed depending on if the slow movement is enabled
+	speed := PLAYER_SPEED
+	if player.movingSlow {
+		speed = PLAYER_SPEED_SLOW
 	}
 
-	// Check X direction
-	if player.input.directions[0] < 0 {
-		*player.x += -delta
-	} else if player.input.directions[0] > 0 {
-		*player.x += delta
-	}
-	// Check Y Direction
-	if player.input.directions[1] < 0 {
-		*player.y += -delta
-	} else if player.input.directions[1] > 0 {
-		*player.y += delta
-	}
+	hAxis := AXIS_HORIZONTAL.Get(0)
+	vAxis := AXIS_VERTICAL.Get(0)
+
+	player.x += int(hAxis * speed)
+
+	// World origin is bottom-left, screen origin is top-left.
+	// Invert Y input axis to account for it.
+	player.y += -int(vAxis * speed)
 }
 
-func (player *Player) move(x *int16, y *int16) {
-	playerX := *x
-	playerY := *y
+func (player *Player) move(x int, y int) {
+	const halfPlayerSize = playerSize / 2
+	const rightBound = PLAYFIELD_WIDTH + halfPlayerSize
+	const bottomBound = PLAYFIELD_HEIGHT + halfPlayerSize
 
-	const halfPlayerSize = int16(playerSize / 2)
+	x = util.ClampInt(0, x, rightBound)
+	y = util.ClampInt(0, y, bottomBound)
 
-	const maxX = PLAYFIELD_X_MAX + halfPlayerSize
-
-	// Limit the player from going out of bound on the x axis
-	if playerX <= -halfPlayerSize {
-		playerX = -halfPlayerSize
-	} else if playerX >= maxX {
-		playerX = maxX
-	}
-
-	const maxY = PLAYFIELD_Y_MAX + halfPlayerSize
-
-	// Limit the player from going out of bound on the y axis
-	if playerY <= -halfPlayerSize {
-		playerY = -halfPlayerSize
-	} else if playerY >= maxY {
-		playerY = maxY
-	}
-
-	*player.x = playerX
-	*player.y = playerY
+	player.x = x
+	player.y = y
 }
 
-func InitalizePlayer() *Player {
-	var x, y int16 = INITAL_PLAYER_X, INITAL_PLAYER_Y
+func NewPlayer() *Player {
+	var x, y = INITAL_PLAYER_X, INITAL_PLAYER_Y
+
 	player := Player{
-		x: &x,
-		y: &y,
-		normalBullets: &Bullets{
+		x: INITAL_PLAYER_X,
+		y: INITAL_PLAYER_Y,
+
+		bullets: &Bullets{
 			framesPerBullet:  regularBulletFramesPerBullet,
 			cooldown:         0,
 			image:            playerRegularBullet,
 			bulletSize:       regularBulletSize,
-			playerX:          &x,
-			playerY:          &y,
+			playerX:          x,
+			playerY:          y,
 			defaultDirection: []int8{0, -1},
 			defaultDelta:     regularBulletDelta,
 		},

@@ -26,7 +26,7 @@ func (axis *Axis) Get(gp ebiten.GamepadID) float64 {
 		keyValue--
 	}
 
-	value := util.Clamp(-1, ebiten.GamepadAxisValue(gp, axis.Axis)+keyValue, 1)
+	value := util.ClampFloat(-1, ebiten.GamepadAxisValue(gp, axis.Axis)+keyValue, 1)
 	if value > -axis.Deadzone && value < axis.Deadzone {
 		return 0
 	}

@@ -9,16 +9,16 @@ const (
 	SCREEN_WIDTH        int     = 900
 	SCREEN_HEIGHT       int     = 700
 	PLAYFIELD_OFFSET    uint8   = 50
-	PLAYFIELD_X_MAX             = 350
-	PLAYFIELD_Y_MAX             = 550
-	INITAL_PLAYER_X             = (PLAYFIELD_X_MAX / 2) - playerSize/4
-	INITAL_PLAYER_Y             = (PLAYFIELD_Y_MAX / 5) * 4
+	PLAYFIELD_WIDTH             = 350
+	PLAYFIELD_HEIGHT            = 550
+	INITAL_PLAYER_X             = (PLAYFIELD_WIDTH / 2) - playerSize/4
+	INITAL_PLAYER_Y             = (PLAYFIELD_HEIGHT / 5) * 4
 	CONTROLLER_DEADZONE float32 = 0.2
 )
 
 // Player speeds
-const playerSlowDelta int8 = 2
-const playerFastDelta int8 = 4
+const PLAYER_SPEED_SLOW float64 = 2
+const PLAYER_SPEED float64 = 4
 
 // Player hitbox
 const hitboxDimension = 8
