@@ -70,23 +70,34 @@ func (player *Player) updateLocation() {
 		speed = PLAYER_SPEED_SLOW
 	}
 
-	hAxis := AXIS_HORIZONTAL.Get(0)
-	vAxis := AXIS_VERTICAL.Get(0)
+	// Normalizing the movement vector means keyboard users
+	// cannot move faster than gamepad users in diagonal directions.
+	// However the game feels a bit sluggish when going diagonally
+	// because of it.
+	// TODO: Figure out a solution to this issue
+	moveX, moveY := util.NormalizeVector(
+		AXIS_HORIZONTAL.Get(0),
+		AXIS_VERTICAL.Get(0),
+	)
 
-	player.x += int(hAxis * speed)
+	player.x += int(moveX * speed)
 
 	// World origin is bottom-left, screen origin is top-left.
 	// Invert Y input axis to account for it.
-	player.y += -int(vAxis * speed)
+	player.y += -int(moveY * speed)
+
+	player.bullets.playerX = player.x
+	player.bullets.playerY = player.y
 }
 
 func (player *Player) move(x int, y int) {
-	const halfPlayerSize = playerSize / 2
-	const rightBound = PLAYFIELD_WIDTH + halfPlayerSize
-	const bottomBound = PLAYFIELD_HEIGHT + halfPlayerSize
+	const leftBound = 0
+	const rightBound = PLAYFIELD_WIDTH
+	const topBound = 0
+	const bottomBound = PLAYFIELD_HEIGHT
 
-	x = util.ClampInt(0, x, rightBound)
-	y = util.ClampInt(0, y, bottomBound)
+	x = util.ClampInt(leftBound, x, rightBound)
+	y = util.ClampInt(topBound, y, bottomBound)
 
 	player.x = x
 	player.y = y
@@ -106,7 +117,7 @@ func NewPlayer() *Player {
 			bulletSize:       regularBulletSize,
 			playerX:          x,
 			playerY:          y,
-			defaultDirection: []int8{0, -1},
+			defaultDirection: util.DegToRad(-90),
 			defaultDelta:     regularBulletDelta,
 		},
 	}

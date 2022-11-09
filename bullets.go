@@ -14,7 +14,7 @@ type Bullets struct {
 	cooldown         uint8
 	image            *ebiten.Image
 	bulletSize       uint
-	defaultDirection []int8
+	defaultDirection float64
 	defaultDelta     int16
 }
 
@@ -52,7 +52,14 @@ func (bullets *Bullets) Update(input *Input) {
 
 	// Check if we should add new bullets
 	if bullets.cooldown == 0 && input.shootingRegularGun {
-		bullets.Spawn(bullets.playerX, bullets.playerY, bullets.bulletSize, 0, float64(bullets.defaultDelta))
+		bullets.Spawn(
+			bullets.playerX+playerSize/2,
+			bullets.playerY,
+			bullets.bulletSize,
+			bullets.defaultDirection,
+			float64(bullets.defaultDelta),
+		)
+
 		bullets.cooldown = bullets.framesPerBullet
 	}
 	// And decrease cooldown if it is not already at 0

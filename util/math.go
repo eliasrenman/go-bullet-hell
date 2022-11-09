@@ -15,3 +15,13 @@ func ClampInt(min int, value int, max int) int {
 	}
 	return value
 }
+
+// Convert from radians to degrees
+func RadToDeg(rad float64) float64 {
+	return rad * (180 / math.Pi)
+}
+
+// Convert from degrees to radians
+func DegToRad(deg float64) float64 {
+	return deg / (180 / math.Pi)
+}
