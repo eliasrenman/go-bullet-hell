@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/eliasrenman/go-bullet-hell/geometry"
 	"github.com/eliasrenman/go-bullet-hell/util"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -75,16 +76,16 @@ func (player *Player) updateLocation() {
 	// However the game feels a bit sluggish when going diagonally
 	// because of it.
 	// TODO: Figure out a solution to this issue
-	moveX, moveY := util.NormalizeVector(
-		AXIS_HORIZONTAL.Get(0),
-		AXIS_VERTICAL.Get(0),
-	)
+	move := geometry.Vector{
+		X: AXIS_HORIZONTAL.Get(0),
+		Y: AXIS_VERTICAL.Get(0),
+	}.Normalized()
 
-	player.x += int(moveX * speed)
+	player.x += int(move.X * speed)
 
 	// World origin is bottom-left, screen origin is top-left.
 	// Invert Y input axis to account for it.
-	player.y += -int(moveY * speed)
+	player.y += -int(move.Y * speed)
 
 	player.bullets.playerX = player.x
 	player.bullets.playerY = player.y
