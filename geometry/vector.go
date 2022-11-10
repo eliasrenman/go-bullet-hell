@@ -55,29 +55,34 @@ func (vec Vector) Copy() Vector {
 // Pointer arithmetic
 // modifies the original variable
 
-func (a *Vector) Add(b Vector) {
+func (a *Vector) Add(b Vector) *Vector {
 	a.X += b.X
 	a.Y += b.Y
+	return a
 }
 
-func (a *Vector) Subtract(b Vector) {
+func (a *Vector) Subtract(b Vector) *Vector {
 	a.X -= b.X
 	a.Y -= b.Y
+	return a
 }
 
-func (a *Vector) Multiply(b Vector) {
+func (a *Vector) Multiply(b Vector) *Vector {
 	a.X *= b.X
 	a.Y *= b.Y
+	return a
 }
 
-func (a *Vector) Divide(b Vector) {
+func (a *Vector) Divide(b Vector) *Vector {
 	a.X /= b.X
 	a.Y /= b.Y
+	return a
 }
 
-func (a *Vector) Scale(b float64) {
+func (a *Vector) Scale(b float64) *Vector {
 	a.X *= b
 	a.Y *= b
+	return a
 }
 
 // Value arithmetic
@@ -86,34 +91,29 @@ func (a *Vector) Scale(b float64) {
 func (a Vector) Plus(b Vector) Vector {
 	v := a.Copy()
 	v.Add(b)
-
 	return v
 }
 
 func (a Vector) Minus(b Vector) Vector {
 	v := a.Copy()
 	v.Subtract(b)
-
 	return v
 }
 
 func (a Vector) Dot(b Vector) Vector {
 	v := a.Copy()
 	v.Multiply(b)
-
 	return v
 }
 
 func (a Vector) DividedBy(b Vector) Vector {
 	v := a.Copy()
 	v.Divide(b)
-
 	return v
 }
 
 func (a Vector) ScaledBy(b float64) Vector {
 	v := a.Copy()
 	v.Scale(b)
-
 	return v
 }

@@ -1,6 +1,6 @@
 package geometry
 
 type Size struct {
-	Width  int
-	Height int
+	Width  float64
+	Height float64
 }
