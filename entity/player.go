@@ -28,14 +28,13 @@ func (player *Player) Update() {
 	move := geometry.Vector{
 		X: input.AxisHorizontal.Get(0),
 		Y: -input.AxisVertical.Get(0),
-	}
+	}.Normalized()
 
 	speed := moveSpeed
 	if input.ButtonSlow.Get(0) {
 		speed = moveSpeedSlow
 	}
 
-	move.Normalize()
 	move.Scale(speed)
 
 	player.Move(move)

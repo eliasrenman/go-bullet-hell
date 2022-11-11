@@ -1,7 +1,6 @@
 package assets
 
 import (
-	"fmt"
 	"image"
 	_ "image/png"
 	"log"
@@ -35,12 +34,10 @@ func LoadImage(path string, origin geometry.Point) *Image {
 		log.Fatal(err)
 	}
 
-	dataImg, format, err := image.Decode(data)
+	dataImg, _, err := image.Decode(data)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println(format)
 
 	image := ebiten.NewImageFromImage(dataImg)
 
@@ -58,7 +55,12 @@ func LoadImage(path string, origin geometry.Point) *Image {
 func (image *Image) Draw(target *ebiten.Image, position geometry.Point, scale geometry.Size, rotation float64) {
 	op := &ebiten.DrawImageOptions{}
 
-	position.Subtract(image.Origin).Add(constant.WORLD_ORIGIN)
+	position.Add(constant.WORLD_ORIGIN)
+	position.Subtract(image.Origin.Dot(geometry.Vector{
+		X: image.Size.Width,
+		Y: image.Size.Height,
+	}))
+
 	op.GeoM.Translate(position.X, position.Y)
 	op.GeoM.Scale(float64(scale.Width), float64(scale.Height))
 	op.GeoM.Rotate(rotation)
