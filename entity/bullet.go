@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"github.com/eliasrenman/go-bullet-hell/assets"
 	"github.com/eliasrenman/go-bullet-hell/geometry"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -9,7 +10,6 @@ import (
 type Bullet struct {
 	Entity
 	Damage int
-	geometry.Size
 
 	// Read-only! Use SetAngularVelocity to set the speed
 	Speed float64
@@ -29,18 +29,32 @@ type BulletOwner struct {
 	Bullets map[*Bullet]struct{}
 }
 
-func (owner *BulletOwner) Spawn(position geometry.Point, size geometry.Size, direction float64, speed float64) {
-	bullet := Bullet{
-		Entity: Entity{Position: position},
-		Size:   size,
+func NewBulletOwner() BulletOwner {
+	return BulletOwner{
+		Bullets: make(map[*Bullet]struct{}),
 	}
+}
+
+func (owner *BulletOwner) Shoot(position geometry.Point, direction float64, speed float64) {
+	bullet := Spawn(&Bullet{
+		Entity: Entity{Position: position},
+	})
 	bullet.SetAngularVelocity(speed, direction)
 
 	// Add a reference to the bullet in the owner's bullet set
-	owner.Bullets[&bullet] = struct{}{}
+	owner.Bullets[bullet] = struct{}{}
 }
 
-func (b *Bullet) Start()                    {}
-func (b *Bullet) Update()                   {}
-func (b *Bullet) Draw(screen *ebiten.Image) {}
-func (b *Bullet) Die()                      {}
+func (b *Bullet) Start() {}
+
+func (b *Bullet) Update() {
+	b.Move(b.Velocity)
+}
+
+var bulletImage = assets.LoadImage("bullets/bullet.png", assets.OriginCenter)
+
+func (b *Bullet) Draw(screen *ebiten.Image) {
+	bulletImage.Draw(screen, b.Position, geometry.Size{Width: 1, Height: 1}, 0)
+}
+
+func (b *Bullet) Die() {}

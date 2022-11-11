@@ -12,9 +12,10 @@ type Game struct {
 }
 
 func InitalizeGame() *Game {
-	player := entity.Spawn(&entity.Player{})
-	player.Position.X = INITIAL_PLAYER_X
-	player.Position.Y = INITIAL_PLAYER_Y
+	player := entity.Spawn(entity.NewPlayer(geometry.Point{
+		X: INITIAL_PLAYER_X,
+		Y: INITIAL_PLAYER_Y,
+	}))
 
 	game := Game{player: player}
 	return &game

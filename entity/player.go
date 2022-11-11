@@ -6,6 +6,7 @@ import (
 	"github.com/eliasrenman/go-bullet-hell/assets"
 	"github.com/eliasrenman/go-bullet-hell/geometry"
 	"github.com/eliasrenman/go-bullet-hell/input"
+	"github.com/eliasrenman/go-bullet-hell/util"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -16,15 +17,27 @@ type Player struct {
 	BulletOwner
 	Entity
 
-	shooting   bool
-	shootTimer time.Timer
 	// Bullets shot per second
-	shootSpeed float64
+	ShootSpeed    float64
+	CanShoot      bool
+	lastShootTime time.Time
+}
+
+func NewPlayer(position geometry.Point) *Player {
+	return &Player{
+		Entity: Entity{
+			Position: position,
+		},
+		BulletOwner: NewBulletOwner(),
+		ShootSpeed:  10,
+		CanShoot:    true,
+	}
 }
 
 func (player *Player) Start() {}
 
 func (player *Player) Update() {
+	// Handle movement
 	move := geometry.Vector{
 		X: input.AxisHorizontal.Get(0),
 		Y: -input.AxisVertical.Get(0),
@@ -36,8 +49,20 @@ func (player *Player) Update() {
 	}
 
 	move.Scale(speed)
-
 	player.Move(move)
+
+	// Handle shooting
+	if player.CanShoot && input.ButtonShoot.Get(0) {
+		if time.Since(player.lastShootTime) > time.Second/time.Duration(player.ShootSpeed) {
+			player.Shoot(
+				player.Position,
+				util.DegToRad(-90),
+				6,
+			)
+
+			player.lastShootTime = time.Now()
+		}
+	}
 }
 
 func (player *Player) Die() {
