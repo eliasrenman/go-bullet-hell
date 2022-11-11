@@ -1,7 +1,9 @@
 package assets
 
 import (
+	"fmt"
 	"image"
+	_ "image/png"
 	"log"
 
 	"github.com/eliasrenman/go-bullet-hell/constant"
@@ -28,15 +30,17 @@ type Image struct {
 }
 
 func LoadImage(path string, origin geometry.Point) *Image {
-	data, err := Assets.Open(path)
+	data, err := Assets.Open("data/" + path)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	dataImg, _, err := image.Decode(data)
+	dataImg, format, err := image.Decode(data)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println(format)
 
 	image := ebiten.NewImageFromImage(dataImg)
 

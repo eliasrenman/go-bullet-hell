@@ -1,6 +1,9 @@
 package entity
 
-import "github.com/eliasrenman/go-bullet-hell/geometry"
+import (
+	"github.com/eliasrenman/go-bullet-hell/geometry"
+	"github.com/hajimehoshi/ebiten/v2"
+)
 
 // Bullets are Entities with additional values for Damage, Size, Speed and Direction
 type Bullet struct {
@@ -23,7 +26,7 @@ func (b *Bullet) SetAngularVelocity(speed float64, direction float64) {
 // A Bullet Owner owns a number of bullets,
 // they also have backreferences to their owner
 type BulletOwner struct {
-	Bullets []Bullet
+	Bullets map[*Bullet]struct{}
 }
 
 func (owner *BulletOwner) Spawn(position geometry.Point, size geometry.Size, direction float64, speed float64) {
@@ -33,5 +36,11 @@ func (owner *BulletOwner) Spawn(position geometry.Point, size geometry.Size, dir
 	}
 	bullet.SetAngularVelocity(speed, direction)
 
-	owner.Bullets = append(owner.Bullets, bullet)
+	// Add a reference to the bullet in the owner's bullet set
+	owner.Bullets[&bullet] = struct{}{}
 }
+
+func (b *Bullet) Start()                    {}
+func (b *Bullet) Update()                   {}
+func (b *Bullet) Draw(screen *ebiten.Image) {}
+func (b *Bullet) Die()                      {}

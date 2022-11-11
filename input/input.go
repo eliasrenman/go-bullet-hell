@@ -5,34 +5,52 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-type Axis struct {
-	Axis        int
-	KeyPositive ebiten.Key
-	KeyNegative ebiten.Key
-	Deadzone    float64
+type axis struct {
+	axis        int
+	keyPositive ebiten.Key
+	keyNegative ebiten.Key
+	deadzone    float64
 }
 
-type Button struct {
-	Button ebiten.GamepadButton
-	Key    ebiten.Key
+type button struct {
+	button ebiten.GamepadButton
+	key    ebiten.Key
 }
 
-func (axis *Axis) Get(gp ebiten.GamepadID) float64 {
+// TODO: Convert these to a struct and import via a json or toml marshaler
+var (
+	AxisHorizontal = axis{
+		axis:        0,
+		keyPositive: ebiten.KeyD,
+		keyNegative: ebiten.KeyA,
+	}
+	AxisVertical = axis{
+		axis:        1,
+		keyPositive: ebiten.KeyW,
+		keyNegative: ebiten.KeyS,
+	}
+	ButtonSlow = button{
+		button: ebiten.GamepadButton6,
+		key:    ebiten.KeyShift,
+	}
+)
+
+func (axis *axis) Get(gp ebiten.GamepadID) float64 {
 	keyValue := float64(0)
-	if ebiten.IsKeyPressed(axis.KeyPositive) {
+	if ebiten.IsKeyPressed(axis.keyPositive) {
 		keyValue++
 	}
-	if ebiten.IsKeyPressed(axis.KeyNegative) {
+	if ebiten.IsKeyPressed(axis.keyNegative) {
 		keyValue--
 	}
 
-	value := util.ClampFloat(-1, ebiten.GamepadAxisValue(gp, axis.Axis)+keyValue, 1)
-	if value > -axis.Deadzone && value < axis.Deadzone {
+	value := util.ClampFloat(-1, ebiten.GamepadAxisValue(gp, axis.axis)+keyValue, 1)
+	if value > -axis.deadzone && value < axis.deadzone {
 		return 0
 	}
 	return value
 }
 
-func (button *Button) Get(gp ebiten.GamepadID) bool {
-	return ebiten.IsGamepadButtonPressed(gp, button.Button) || ebiten.IsKeyPressed(button.Key)
+func (button *button) Get(gp ebiten.GamepadID) bool {
+	return ebiten.IsGamepadButtonPressed(gp, button.button) || ebiten.IsKeyPressed(button.key)
 }

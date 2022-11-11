@@ -8,3 +8,10 @@ type Entity struct {
 	Position geometry.Point
 	Velocity geometry.Vector
 }
+
+func (entity *Entity) Move(vector geometry.Vector) {
+	entity.Position.X += vector.X
+	entity.Position.Y += vector.Y
+
+	// TODO: Implement some kind of collision system here
+}

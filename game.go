@@ -1,41 +1,39 @@
 package main
 
 import (
+	"github.com/eliasrenman/go-bullet-hell/assets"
+	"github.com/eliasrenman/go-bullet-hell/entity"
+	"github.com/eliasrenman/go-bullet-hell/geometry"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 type Game struct {
-	player *Player
+	player *entity.Player
 }
 
 func InitalizeGame() *Game {
-	game := Game{
-		player: NewPlayer(),
-	}
+	player := entity.Spawn(&entity.Player{})
+	player.Position.X = INITIAL_PLAYER_X
+	player.Position.Y = INITIAL_PLAYER_Y
+
+	game := Game{player: player}
 	return &game
 }
 
-func (game Game) Draw(screen *ebiten.Image) {
-	// Draw background
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(0, 0)
-	screen.DrawImage(backgroundImage, op)
+var backgroundImage = assets.LoadImage("bg/playfield.png", assets.OriginTopLeft)
 
-	// Draw characters
-	game.player.Draw(screen)
-	// Draw bullets
+func (game Game) Draw(screen *ebiten.Image) {
+	backgroundImage.Draw(screen, geometry.Point{X: 0, Y: 0}, geometry.Size{Width: 1, Height: 1}, 0)
+
+	// Draw game objects
+	for obj := range entity.GameObjects {
+		obj.Draw(screen)
+	}
 }
 func (game Game) Update() error {
-	//Append the keys
-	gameInput.keys = inpututil.AppendPressedKeys(gameInput.keys[:0])
-	gameInput.Update()
-	// get gameInput
-	input := gameInput.TranslateInput()
-	// update characters
-	game.player.Update(input)
-	// update bullets
-	// Return no error
+	for obj := range entity.GameObjects {
+		obj.Update()
+	}
 	return nil
 }
 

@@ -1,18 +1,13 @@
 package main
 
-import (
-	"github.com/eliasrenman/go-bullet-hell/input"
-	"github.com/hajimehoshi/ebiten/v2"
-)
-
 const (
 	SCREEN_WIDTH        int     = 900
 	SCREEN_HEIGHT       int     = 700
 	PLAYFIELD_OFFSET    uint8   = 50
 	PLAYFIELD_WIDTH             = 350
 	PLAYFIELD_HEIGHT            = 550
-	INITAL_PLAYER_X             = (PLAYFIELD_WIDTH / 2) - playerSize/4
-	INITAL_PLAYER_Y             = (PLAYFIELD_HEIGHT / 5) * 4
+	INITIAL_PLAYER_X            = PLAYFIELD_WIDTH / 2
+	INITIAL_PLAYER_Y            = (PLAYFIELD_HEIGHT / 5) * 4
 	CONTROLLER_DEADZONE float32 = 0.2
 )
 
@@ -23,11 +18,6 @@ const PLAYER_SPEED float64 = 4
 // Player hitbox
 const hitboxDimension = 8
 
-// Regular player Bullets
-const regularBulletSize = 8
-const regularBulletFramesPerBullet = 5
-const regularBulletDelta = 6
-
 const (
 	LEFT        = "Left"
 	RIGHT       = "Right"
@@ -35,24 +25,6 @@ const (
 	UP          = "Up"
 	SLOW        = "Slow"
 	REGULAR_GUN = "REGULAR_GUN"
-)
-
-// TODO: Convert these to a struct and import via a json or toml marshaler
-var (
-	AXIS_HORIZONTAL = input.Axis{
-		Axis:        0,
-		KeyPositive: ebiten.KeyD,
-		KeyNegative: ebiten.KeyA,
-	}
-	AXIS_VERTICAL = input.Axis{
-		Axis:        1,
-		KeyPositive: ebiten.KeyW,
-		KeyNegative: ebiten.KeyS,
-	}
-	BUTTON_SLOW = input.Button{
-		Button: ebiten.GamepadButton6,
-		Key:    ebiten.KeyShift,
-	}
 )
 
 var keyboardBindings = map[string]string{
