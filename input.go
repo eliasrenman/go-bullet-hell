@@ -18,6 +18,7 @@ type Input struct {
 }
 
 type InputController struct {
+	gamepads       []ebiten.GamepadID
 	keys           []ebiten.Key
 	gamepadIDsBuf  []ebiten.GamepadID
 	gamepadIDs     map[ebiten.GamepadID]struct{}
@@ -147,43 +148,43 @@ func translateButtonInputs(val string, directions []int8, movingSlow bool, shoot
 	return directions, movingSlow, shootingRegularGun
 }
 
-func (g *InputController) Update() error {
+func (ic *InputController) Update() error {
 
-	if g.gamepadIDs == nil {
-		g.gamepadIDs = map[ebiten.GamepadID]struct{}{}
+	if ic.gamepadIDs == nil {
+		ic.gamepadIDs = map[ebiten.GamepadID]struct{}{}
 	}
 
 	// Log the gamepad connection events.
-	g.gamepadIDsBuf = inpututil.AppendJustConnectedGamepadIDs(g.gamepadIDsBuf[:0])
-	for _, id := range g.gamepadIDsBuf {
+	ic.gamepadIDsBuf = inpututil.AppendJustConnectedGamepadIDs(ic.gamepadIDsBuf[:0])
+	for _, id := range ic.gamepadIDsBuf {
 		log.Printf("gamepad connected: id: %d, SDL ID: %s", id, ebiten.GamepadSDLID(id))
-		g.gamepadIDs[id] = struct{}{}
+		ic.gamepadIDs[id] = struct{}{}
 	}
-	for id := range g.gamepadIDs {
+	for id := range ic.gamepadIDs {
 		if inpututil.IsGamepadJustDisconnected(id) {
 			log.Printf("gamepad disconnected: id: %d", id)
-			delete(g.gamepadIDs, id)
+			delete(ic.gamepadIDs, id)
 		}
 	}
 
-	g.axes = map[ebiten.GamepadID][]float32{}
-	g.pressedButtons = map[ebiten.GamepadID][]string{}
-	for id := range g.gamepadIDs {
+	ic.axes = map[ebiten.GamepadID][]float32{}
+	ic.pressedButtons = map[ebiten.GamepadID][]string{}
+	for id := range ic.gamepadIDs {
 		maxAxis := ebiten.GamepadAxisCount(id)
 		for a := 0; a < maxAxis; a++ {
 			v := ebiten.GamepadAxisValue(id, a)
 
 			// sets the gamePad to active
 			if v != 0 {
-				g.gamepadActive = true
+				ic.gamepadActive = true
 			}
-			g.axes[id] = append(g.axes[id], float32(v))
+			ic.axes[id] = append(ic.axes[id], float32(v))
 		}
 
 		maxButton := ebiten.GamepadButton(ebiten.GamepadButtonCount(id))
 		for b := ebiten.GamepadButton(id); b < maxButton; b++ {
 			if ebiten.IsGamepadButtonPressed(id, b) {
-				g.pressedButtons[id] = append(g.pressedButtons[id], strconv.Itoa(int(b)))
+				ic.pressedButtons[id] = append(ic.pressedButtons[id], strconv.Itoa(int(b)))
 			}
 		}
 
@@ -221,9 +222,9 @@ func (g *InputController) Update() error {
 			}
 		}
 	}
-	for _, v := range g.pressedButtons {
+	for _, v := range ic.pressedButtons {
 		if len(v) > 0 {
-			g.gamepadActive = true
+			ic.gamepadActive = true
 		}
 	}
 

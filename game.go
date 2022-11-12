@@ -11,7 +11,7 @@ type Game struct {
 
 func InitalizeGame() *Game {
 	game := Game{
-		player: InitalizePlayer(),
+		player: NewPlayer(),
 	}
 	return &game
 }
@@ -39,9 +39,14 @@ func (game Game) Update() error {
 	return nil
 }
 
-func normalizeXCoord(x int16) float64 {
+func normalizeXCoord(x int) float64 {
 	return float64(x) + float64(PLAYFIELD_OFFSET)
 }
-func normalizeYCoord(y int16) float64 {
+
+func normalizeYCoord(y int) float64 {
 	return float64(y) + float64(PLAYFIELD_OFFSET)
+}
+
+func normalizeCoords(x int, y int) (float64, float64) {
+	return normalizeXCoord(x), normalizeYCoord(y)
 }
