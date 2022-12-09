@@ -88,4 +88,9 @@ func (player *Player) Draw(screen *ebiten.Image) {
 	}
 
 	image.Draw(screen, player.Position, geometry.Size{Width: 1, Height: 1}, 0)
+
+	// Draw all bullets on the player
+	for obj := range player.Bullets {
+		obj.Draw(screen)
+	}
 }
