@@ -1,22 +1,26 @@
 package assets
 
 import (
-  "github.com/eliasrenman/go-bullet-hell/geometry"
+	"fmt"
+
+	"github.com/eliasrenman/go-bullet-hell/geometry"
+	"github.com/eliasrenman/go-bullet-hell/util"
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Background struct {
-	image *Image
-  vector geometry.Vector
+	Image    *Image
+	Velocity geometry.Vector
 }
 
-func (background *Background) TileDraw() {}
+func (background *Background) Draw(screen *ebiten.Image) {
+	offset := geometry.Vector{X: 1, Y: 1}
+	offset.Multiply(background.Velocity)
+	offset.Scale(util.CurrentSeconds())
+	offset.Scale(1. / 100)
 
-func NewBackground(img *Image) *Background {
-  return &Background{
-    image: img,
-    vector: geometry.Vector{
-      X: 0,
-      Y: 1,
-    },
-  };
+	fmt.Println(offset)
+
+	background.Image.DrawTiled(screen, geometry.Point{}, geometry.Size{Width: 1, Height: 1}, 0, offset)
+
 }

@@ -7,6 +7,14 @@ type Vector struct {
 	Y float64
 }
 
+var (
+	Zero  = Vector{X: 0, Y: 0}
+	Up    = Vector{X: 0, Y: -1}
+	Down  = Vector{X: 0, Y: 1}
+	Left  = Vector{X: -1, Y: 0}
+	Right = Vector{X: 1, Y: 0}
+)
+
 type Point = Vector
 
 func VectorFromAngle(angle float64) Vector {

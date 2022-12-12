@@ -8,8 +8,11 @@ import (
 )
 
 type Game struct {
-	player *entity.Player
+	player     *entity.Player
+	background assets.Background
 }
+
+var backgroundImage = assets.LoadImage("bg/img1.png", assets.OriginTopLeft)
 
 func InitalizeGame() *Game {
 	player := entity.Spawn(entity.NewPlayer(geometry.Point{
@@ -17,21 +20,28 @@ func InitalizeGame() *Game {
 		Y: INITIAL_PLAYER_Y,
 	}))
 
-	game := Game{player: player}
+	game := Game{
+		player: player,
+		background: assets.Background{
+			Image:    backgroundImage,
+			Velocity: geometry.Up.ScaledBy(15),
+		},
+	}
+
 	return &game
 }
 
-var backgroundImage = assets.LoadImage("bg/img1.png", assets.OriginTopLeft)
-
-func (game Game) Draw(screen *ebiten.Image) {
-	backgroundImage.Draw(screen, geometry.Point{X: 0, Y: 0}, geometry.Size{Width: 1, Height: 1}, 0)
+func (game *Game) Draw(screen *ebiten.Image) {
+	// Draw background
+	game.background.Draw(screen)
 
 	// Draw game objects
 	for obj := range entity.GameObjects {
 		obj.Draw(screen)
 	}
 }
-func (game Game) Update() error {
+
+func (game *Game) Update() error {
 	for obj := range entity.GameObjects {
 		obj.Update()
 	}
