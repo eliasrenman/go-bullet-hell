@@ -21,7 +21,7 @@ func InitalizeGame() *Game {
 	return &game
 }
 
-var backgroundImage = assets.LoadImage("bg/playfield.png", assets.OriginTopLeft)
+var backgroundImage = assets.LoadImage("bg/img1.png", assets.OriginTopLeft)
 
 func (game Game) Draw(screen *ebiten.Image) {
 	backgroundImage.Draw(screen, geometry.Point{X: 0, Y: 0}, geometry.Size{Width: 1, Height: 1}, 0)
