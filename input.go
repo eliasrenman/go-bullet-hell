@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/eliasrenman/go-bullet-hell/constant"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
@@ -48,7 +49,7 @@ func (iC InputController) translateKeyboardInput() *Input {
 	for _, key := range iC.keys {
 		// fmt.Println(key)
 		// Checks if the key pressed is within the bounds of the keybindings
-		if val, ok := keyboardBindings[key.String()]; ok {
+		if val, ok := constant.KeyboardBindings[key.String()]; ok {
 			// Switch case to check the inputs
 			directions, movingSlow, shootingRegularGun = translateButtonInputs(val, directions, movingSlow, shootingRegularGun)
 		}
@@ -72,18 +73,18 @@ func (iC InputController) translateControllerInput() *Input {
 		if len(axis) > 0 {
 			// Check axis for x direction
 			xAxis := float32(axis[0])
-			if xAxis > CONTROLLER_DEADZONE {
+			if xAxis > constant.CONTROLLER_DEADZONE {
 				directions[0] = 1
-			} else if xAxis < -CONTROLLER_DEADZONE {
+			} else if xAxis < -constant.CONTROLLER_DEADZONE {
 				directions[0] = -1
 			}
 
 			// Check axis for y direction
 			yAxis := float32(axis[1])
 
-			if yAxis > CONTROLLER_DEADZONE {
+			if yAxis > constant.CONTROLLER_DEADZONE {
 				directions[1] = 1
-			} else if yAxis < -CONTROLLER_DEADZONE {
+			} else if yAxis < -constant.CONTROLLER_DEADZONE {
 				directions[1] = -1
 			}
 		}
@@ -94,7 +95,7 @@ func (iC InputController) translateControllerInput() *Input {
 		if len(buttons) > 0 {
 			for _, button := range buttons {
 				// This is potentionally a bad practice since it takes the last gamepad with input on it.
-				if val, ok := controllerBindings[button]; ok {
+				if val, ok := constant.ControllerBindings[button]; ok {
 					directions, movingSlow, shootingRegularGun = translateButtonInputs(val, directions, movingSlow, shootingRegularGun)
 				}
 			}
@@ -114,32 +115,32 @@ func translateButtonInputs(val string, directions []int8, movingSlow bool, shoot
 
 	// Switch case to check the inputs
 	switch val {
-	case LEFT:
+	case constant.LEFT:
 		{
 			directions[0] += -1
 			break
 		}
-	case RIGHT:
+	case constant.RIGHT:
 		{
 			directions[0] += 1
 			break
 		}
-	case UP:
+	case constant.UP:
 		{
 			directions[1] += -1
 			break
 		}
-	case DOWN:
+	case constant.DOWN:
 		{
 			directions[1] += 1
 			break
 		}
-	case SLOW:
+	case constant.SLOW:
 		{
 			movingSlow = true
 			break
 		}
-	case REGULAR_GUN:
+	case constant.REGULAR_GUN:
 		{
 			shootingRegularGun = true
 			break
@@ -230,5 +231,3 @@ func (ic *InputController) Update() error {
 
 	return nil
 }
-
-var gameInput = InputController{}

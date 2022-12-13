@@ -1,4 +1,4 @@
-package main
+package constant
 
 const (
 	SCREEN_WIDTH              int     = 900
@@ -28,7 +28,7 @@ const (
 	REGULAR_GUN = "REGULAR_GUN"
 )
 
-var keyboardBindings = map[string]string{
+var KeyboardBindings = map[string]string{
 	"W":          UP,
 	"S":          DOWN,
 	"A":          LEFT,
@@ -41,7 +41,7 @@ var keyboardBindings = map[string]string{
 	"Z":          REGULAR_GUN,
 }
 
-var controllerBindings = map[string]string{
+var ControllerBindings = map[string]string{
 	// "W":          UP,
 	// "S":          DOWN,
 	// "A":          LEFT,

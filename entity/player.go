@@ -15,26 +15,37 @@ const moveSpeedSlow float64 = 2
 
 type Player struct {
 	BulletOwner
-	Entity
+	*Entity
 
 	// Bullets shot per second
 	ShootSpeed    float64
 	CanShoot      bool
 	lastShootTime time.Time
+
+	Hitbox Hitbox
 }
 
 func NewPlayer(position geometry.Point) *Player {
-	return &Player{
-		Entity: Entity{
-			Position: position,
+	entity := &Entity{
+		Position: position,
+	}
+	player := &Player{
+		Entity: entity,
+		Hitbox: Hitbox{
+			MinBox: geometry.Point{X: 0, Y: 0},
+			MaxBox: geometry.Point{X: 8, Y: 8},
+			Entity: entity,
 		},
 		BulletOwner: NewBulletOwner(),
 		ShootSpeed:  10,
 		CanShoot:    true,
 	}
+	return player
 }
 
 func (player *Player) Start() {}
+
+var gameFieldHitbox = NewFieldHitbox()
 
 func (player *Player) Update() {
 	// Handle movement
@@ -52,6 +63,8 @@ func (player *Player) Update() {
 	player.Move(move)
 	player.Velocity = move
 
+	gameFieldHitbox.Inside(player.Hitbox)
+	// println(colision.X, colision.Y)
 	// Handle shooting
 	if player.CanShoot && input.ButtonShoot.Get(0) {
 		// Normalize the amount of bullets being shot.

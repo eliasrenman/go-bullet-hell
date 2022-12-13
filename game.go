@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/eliasrenman/go-bullet-hell/assets"
+	"github.com/eliasrenman/go-bullet-hell/constant"
 	"github.com/eliasrenman/go-bullet-hell/entity"
 	"github.com/eliasrenman/go-bullet-hell/geometry"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -16,15 +17,15 @@ var backgroundImage = assets.LoadImage("bg/img1.png", assets.OriginTopLeft)
 
 func InitalizeGame() *Game {
 	player := entity.Spawn(entity.NewPlayer(geometry.Point{
-		X: INITIAL_PLAYER_X,
-		Y: INITIAL_PLAYER_Y,
+		X: constant.INITIAL_PLAYER_X,
+		Y: constant.INITIAL_PLAYER_Y,
 	}))
 
 	game := Game{
 		player: player,
 		background: assets.Background{
 			Image:    backgroundImage,
-			Velocity: geometry.Up.ScaledBy(STANDARD_BACKGROUND_SPEED),
+			Velocity: geometry.Up.ScaledBy(constant.STANDARD_BACKGROUND_SPEED),
 		},
 	}
 
@@ -43,11 +44,11 @@ func (game *Game) Draw(screen *ebiten.Image) {
 	DrawGameView(screen)
 }
 
-var gameView = ebiten.NewImage(PLAYFIELD_WIDTH, PLAYFIELD_HEIGHT)
+var gameView = ebiten.NewImage(constant.PLAYFIELD_WIDTH, constant.PLAYFIELD_HEIGHT)
 
 func DrawGameView(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	position := geometry.Point{X: float64(PLAYFIELD_OFFSET), Y: float64(PLAYFIELD_OFFSET)}
+	position := geometry.Point{X: float64(constant.PLAYFIELD_OFFSET), Y: float64(constant.PLAYFIELD_OFFSET)}
 
 	assets.TranslateScaleAndRotateImage(&op.GeoM, position, geometry.Size{Width: 1, Height: 1}, 0)
 
@@ -67,9 +68,9 @@ func (game *Game) Update() error {
 
 func updateGameBackgroundSpeed(game *Game) {
 	if game.player.Velocity.Y != 0 {
-		offsetVelocity := ((game.player.Velocity.Y * -1) + PLAYER_SPEED) / 2
+		offsetVelocity := ((game.player.Velocity.Y * -1) + constant.PLAYER_SPEED) / 2
 		game.background.Velocity = geometry.Up.ScaledBy(offsetVelocity + 1)
 	} else {
-		game.background.Velocity = geometry.Up.ScaledBy(STANDARD_BACKGROUND_SPEED)
+		game.background.Velocity = geometry.Up.ScaledBy(constant.STANDARD_BACKGROUND_SPEED)
 	}
 }
