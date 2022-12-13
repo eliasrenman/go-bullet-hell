@@ -9,6 +9,7 @@ import (
 
 type Game struct {
 	player     *entity.Player
+	debugger   *Debugger
 	background assets.Background
 }
 
@@ -26,14 +27,17 @@ func InitalizeGame() *Game {
 			Image:    backgroundImage,
 			Velocity: geometry.Up.ScaledBy(15),
 		},
+		debugger: nil,
 	}
+
+	game.debugger = NewDebugger(&game)
 
 	return &game
 }
 
 func (game *Game) Draw(screen *ebiten.Image) {
-	// Draw background
 	game.background.Draw(screen)
+	game.debugger.Draw(screen)
 
 	// Draw game objects
 	for obj := range entity.GameObjects {
@@ -42,20 +46,10 @@ func (game *Game) Draw(screen *ebiten.Image) {
 }
 
 func (game *Game) Update() error {
+	game.debugger.Update()
+
 	for obj := range entity.GameObjects {
 		obj.Update()
 	}
 	return nil
-}
-
-func normalizeXCoord(x int) float64 {
-	return float64(x) + float64(PLAYFIELD_OFFSET)
-}
-
-func normalizeYCoord(y int) float64 {
-	return float64(y) + float64(PLAYFIELD_OFFSET)
-}
-
-func normalizeCoords(x int, y int) (float64, float64) {
-	return normalizeXCoord(x), normalizeYCoord(y)
 }

@@ -37,6 +37,9 @@ var (
 		button: ebiten.GamepadButton0,
 		key:    ebiten.KeySpace,
 	}
+	ButtonDebug = button{
+		key: ebiten.KeyF3,
+	}
 )
 
 func (axis *axis) Get(gp ebiten.GamepadID) float64 {
