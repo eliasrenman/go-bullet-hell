@@ -19,18 +19,18 @@ func (hitbox *Hitbox) Inside(compare Hitbox) geometry.Vector {
 
 	compareMin := compare.GetMinPoint()
 	compareMax := compare.GetMaxPoint()
-	if hitboxMin.X > compareMin.X || hitboxMax.X > compareMin.X {
-		x -= 1
-	}
-	if hitboxMin.X < compareMax.X || hitboxMax.X < compareMax.X {
+	if hitboxMin.X >= compareMin.X || hitboxMax.X >= compareMin.X {
 		x += 1
 	}
-
-	if hitboxMin.Y > compareMin.Y || hitboxMax.Y > compareMin.Y {
-		y -= 1
+	if hitboxMin.X <= compareMax.X || hitboxMax.X <= compareMax.X {
+		x -= 1
 	}
-	if hitboxMin.Y < compareMax.Y || hitboxMax.Y < compareMax.Y {
+
+	if hitboxMin.Y >= compareMin.Y || hitboxMax.Y >= compareMin.Y {
 		y += 1
+	}
+	if hitboxMin.Y <= compareMax.Y || hitboxMax.Y <= compareMax.Y {
+		y -= 1
 	}
 
 	return geometry.Vector{

@@ -33,7 +33,7 @@ func NewPlayer(position geometry.Point) *Player {
 		Entity: entity,
 		Hitbox: Hitbox{
 			MinBox: geometry.Point{X: 0, Y: 0},
-			MaxBox: geometry.Point{X: 8, Y: 8},
+			MaxBox: geometry.Point{X: 1, Y: 1},
 			Entity: entity,
 		},
 		BulletOwner: NewBulletOwner(),
@@ -59,11 +59,14 @@ func (player *Player) Update() {
 		speed = moveSpeedSlow
 	}
 
+	// Make sure to check border colision and cancel out movement.
+	borderColisionVector := gameFieldHitbox.Inside(player.Hitbox)
+	move.Add(borderColisionVector)
+
 	move.Scale(speed)
 	player.Move(move)
 	player.Velocity = move
 
-	gameFieldHitbox.Inside(player.Hitbox)
 	// println(colision.X, colision.Y)
 	// Handle shooting
 	if player.CanShoot && input.ButtonShoot.Get(0) {
