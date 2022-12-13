@@ -24,7 +24,7 @@ func InitalizeGame() *Game {
 		player: player,
 		background: assets.Background{
 			Image:    backgroundImage,
-			Velocity: geometry.Up.ScaledBy(3),
+			Velocity: geometry.Up.ScaledBy(STANDARD_BACKGROUND_SPEED),
 		},
 	}
 
@@ -55,20 +55,21 @@ func DrawGameView(screen *ebiten.Image) {
 }
 
 func (game *Game) Update() error {
+
+	updateGameBackgroundSpeed(game)
+
+	game.background.Update()
 	for obj := range entity.GameObjects {
 		obj.Update()
 	}
 	return nil
 }
 
-func normalizeXCoord(x int) float64 {
-	return float64(x) + float64(PLAYFIELD_OFFSET)
-}
-
-func normalizeYCoord(y int) float64 {
-	return float64(y) + float64(PLAYFIELD_OFFSET)
-}
-
-func normalizeCoords(x int, y int) (float64, float64) {
-	return normalizeXCoord(x), normalizeYCoord(y)
+func updateGameBackgroundSpeed(game *Game) {
+	if game.player.Velocity.Y != 0 {
+		offsetVelocity := ((game.player.Velocity.Y * -1) + PLAYER_SPEED) / 2
+		game.background.Velocity = geometry.Up.ScaledBy(offsetVelocity + 1)
+	} else {
+		game.background.Velocity = geometry.Up.ScaledBy(STANDARD_BACKGROUND_SPEED)
+	}
 }

@@ -50,9 +50,11 @@ func (player *Player) Update() {
 
 	move.Scale(speed)
 	player.Move(move)
+	player.Velocity = move
 
 	// Handle shooting
 	if player.CanShoot && input.ButtonShoot.Get(0) {
+		// Normalize the amount of bullets being shot.
 		if time.Since(player.lastShootTime) > time.Second/time.Duration(player.ShootSpeed) {
 			player.Shoot(
 				player.Position,

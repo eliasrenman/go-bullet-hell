@@ -1,14 +1,15 @@
 package main
 
 const (
-	SCREEN_WIDTH        int     = 900
-	SCREEN_HEIGHT       int     = 700
-	PLAYFIELD_OFFSET    uint8   = 50
-	PLAYFIELD_WIDTH             = 500
-	PLAYFIELD_HEIGHT            = 600
-	INITIAL_PLAYER_X            = PLAYFIELD_WIDTH / 2
-	INITIAL_PLAYER_Y            = (PLAYFIELD_HEIGHT / 5) * 4
-	CONTROLLER_DEADZONE float32 = 0.2
+	SCREEN_WIDTH              int     = 900
+	SCREEN_HEIGHT             int     = 700
+	PLAYFIELD_OFFSET          uint8   = 50
+	PLAYFIELD_WIDTH                   = 500
+	PLAYFIELD_HEIGHT                  = 600
+	INITIAL_PLAYER_X                  = PLAYFIELD_WIDTH / 2
+	INITIAL_PLAYER_Y                  = (PLAYFIELD_HEIGHT / 5) * 4
+	CONTROLLER_DEADZONE       float32 = 0.2
+	STANDARD_BACKGROUND_SPEED         = 3
 )
 
 // Player speeds
