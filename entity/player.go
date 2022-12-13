@@ -52,16 +52,19 @@ func (player *Player) Update() {
 	move := geometry.Vector{
 		X: input.AxisHorizontal.Get(0),
 		Y: -input.AxisVertical.Get(0),
-	}.Normalized()
-
-	speed := moveSpeed
-	if input.ButtonSlow.Get(0) {
-		speed = moveSpeedSlow
 	}
 
 	// Make sure to check border colision and cancel out movement.
 	borderColisionVector := gameFieldHitbox.Inside(player.Hitbox)
 	move.Add(borderColisionVector)
+
+	// Make sure to normalise the movement.
+	move.Normalized()
+
+	speed := moveSpeed
+	if input.ButtonSlow.Get(0) {
+		speed = moveSpeedSlow
+	}
 
 	move.Scale(speed)
 	player.Move(move)
