@@ -32,9 +32,9 @@ func NewPlayer(position geometry.Point) *Player {
 	player := &Player{
 		Entity: entity,
 		Hitbox: Hitbox{
-			MinBox: geometry.Point{X: 0, Y: 0},
-			MaxBox: geometry.Point{X: 1, Y: 1},
-			Entity: entity,
+			MinPoint: geometry.Point{X: 0, Y: 0},
+			MaxPoint: geometry.Point{X: 1, Y: 1},
+			Entity:   entity,
 		},
 		BulletOwner: NewBulletOwner(),
 		ShootSpeed:  10,

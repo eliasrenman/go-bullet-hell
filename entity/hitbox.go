@@ -6,11 +6,15 @@ import (
 )
 
 type Hitbox struct {
-	MinBox geometry.Point
-	MaxBox geometry.Point
-	Entity *Entity
+	MinPoint geometry.Point
+	MaxPoint geometry.Point
+	Entity   *Entity
 }
 
+/*
+This checks that this Hitbox has the compare hitbox inside its box
+@param compare is inside the hitbox
+*/
 func (hitbox *Hitbox) Inside(compare Hitbox) geometry.Vector {
 	x, y := 0., 0.
 
@@ -41,16 +45,16 @@ func (hitbox *Hitbox) Inside(compare Hitbox) geometry.Vector {
 }
 
 func (hitbox *Hitbox) GetMinPoint() geometry.Point {
-	return *hitbox.MinBox.Add(hitbox.Entity.Position)
+	return *hitbox.MinPoint.Add(hitbox.Entity.Position)
 }
 func (hitbox *Hitbox) GetMaxPoint() geometry.Point {
-	return *hitbox.MaxBox.Add(hitbox.Entity.Position)
+	return *hitbox.MaxPoint.Add(hitbox.Entity.Position)
 }
 
 func NewFieldHitbox() *Hitbox {
 	return &Hitbox{
-		MinBox: geometry.Point{X: 0, Y: 0},
-		MaxBox: geometry.Point{X: constant.PLAYFIELD_WIDTH, Y: constant.PLAYFIELD_HEIGHT},
+		MinPoint: geometry.Point{X: 0, Y: 0},
+		MaxPoint: geometry.Point{X: constant.PLAYFIELD_WIDTH, Y: constant.PLAYFIELD_HEIGHT},
 		Entity: &Entity{
 			Velocity: geometry.Zero,
 			Position: geometry.Point{X: 0, Y: 0},
