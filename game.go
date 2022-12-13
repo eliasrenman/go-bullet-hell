@@ -24,7 +24,7 @@ func InitalizeGame() *Game {
 		player: player,
 		background: assets.Background{
 			Image:    backgroundImage,
-			Velocity: geometry.Up.ScaledBy(15),
+			Velocity: geometry.Up.ScaledBy(3),
 		},
 	}
 
@@ -32,13 +32,26 @@ func InitalizeGame() *Game {
 }
 
 func (game *Game) Draw(screen *ebiten.Image) {
+
 	// Draw background
-	game.background.Draw(screen)
+	game.background.Draw(gameView)
 
 	// Draw game objects
 	for obj := range entity.GameObjects {
-		obj.Draw(screen)
+		obj.Draw(gameView)
 	}
+	DrawGameView(screen)
+}
+
+var gameView = ebiten.NewImage(PLAYFIELD_WIDTH, PLAYFIELD_HEIGHT)
+
+func DrawGameView(screen *ebiten.Image) {
+	op := &ebiten.DrawImageOptions{}
+	position := geometry.Point{X: float64(PLAYFIELD_OFFSET), Y: float64(PLAYFIELD_OFFSET)}
+
+	assets.TranslateScaleAndRotateImage(&op.GeoM, position, geometry.Size{Width: 1, Height: 1}, 0)
+
+	screen.DrawImage(gameView, op)
 }
 
 func (game *Game) Update() error {

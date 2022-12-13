@@ -1,8 +1,6 @@
 package assets
 
 import (
-	"fmt"
-
 	"github.com/eliasrenman/go-bullet-hell/geometry"
 	"github.com/eliasrenman/go-bullet-hell/util"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -19,8 +17,6 @@ func (background *Background) Draw(screen *ebiten.Image) {
 	offset.Scale(util.CurrentSeconds())
 	offset.Scale(1. / 100)
 
-	fmt.Println(offset)
-
-	background.Image.DrawTiled(screen, geometry.Point{}, geometry.Size{Width: 1, Height: 1}, 0, offset)
+	background.Image.DrawTiled(screen, geometry.Point{}, geometry.Size{Width: 2, Height: 2}, 0, offset)
 
 }
