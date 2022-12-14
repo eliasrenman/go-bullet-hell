@@ -15,6 +15,8 @@ type axis struct {
 type button struct {
 	button ebiten.GamepadButton
 	key    ebiten.Key
+
+	value bool
 }
 
 // TODO: Convert these to a struct and import via a json or toml marshaler
@@ -59,5 +61,12 @@ func (axis *axis) Get(gp ebiten.GamepadID) float64 {
 }
 
 func (button *button) Get(gp ebiten.GamepadID) bool {
-	return ebiten.IsGamepadButtonPressed(gp, button.button) || ebiten.IsKeyPressed(button.key)
+	button.value = ebiten.IsGamepadButtonPressed(gp, button.button) || ebiten.IsKeyPressed(button.key)
+	return button.value
+}
+
+// GetPressed returns true if the button was pressed this frame
+func (button *button) GetPressed(gp ebiten.GamepadID) bool {
+	pv := button.value
+	return button.Get(gp) && !pv
 }
