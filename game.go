@@ -39,13 +39,13 @@ func InitalizeGame() *Game {
 func (game *Game) Draw(screen *ebiten.Image) {
 	// Draw background
 	game.background.Draw(gameView)
-	game.debugger.Draw(gameView)
 
 	// Draw game objects
 	for obj := range entity.GameObjects {
 		obj.Draw(gameView)
 	}
 	DrawGameView(screen)
+	game.debugger.Draw(screen)
 }
 
 var gameView = ebiten.NewImage(constant.PLAYFIELD_WIDTH, constant.PLAYFIELD_HEIGHT)
