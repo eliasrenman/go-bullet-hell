@@ -47,7 +47,6 @@ func (iC InputController) translateKeyboardInput() *Input {
 	movingSlow := false
 	shootingRegularGun := false
 	for _, key := range iC.keys {
-		// fmt.Println(key)
 		// Checks if the key pressed is within the bounds of the keybindings
 		if val, ok := constant.KeyboardBindings[key.String()]; ok {
 			// Switch case to check the inputs

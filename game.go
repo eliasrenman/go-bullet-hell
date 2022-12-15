@@ -10,6 +10,7 @@ import (
 
 type Game struct {
 	player     *entity.Player
+	debugger   *Debugger
 	background assets.Background
 }
 
@@ -27,13 +28,15 @@ func InitalizeGame() *Game {
 			Image:    backgroundImage,
 			Velocity: geometry.Up.ScaledBy(constant.STANDARD_BACKGROUND_SPEED),
 		},
+		debugger: nil,
 	}
+
+	game.debugger = NewDebugger(&game)
 
 	return &game
 }
 
 func (game *Game) Draw(screen *ebiten.Image) {
-
 	// Draw background
 	game.background.Draw(gameView)
 
@@ -42,6 +45,7 @@ func (game *Game) Draw(screen *ebiten.Image) {
 		obj.Draw(gameView)
 	}
 	DrawGameView(screen)
+	game.debugger.Draw(screen)
 }
 
 var gameView = ebiten.NewImage(constant.PLAYFIELD_WIDTH, constant.PLAYFIELD_HEIGHT)
@@ -56,10 +60,9 @@ func DrawGameView(screen *ebiten.Image) {
 }
 
 func (game *Game) Update() error {
-
 	updateGameBackgroundSpeed(game)
-
 	game.background.Update()
+	game.debugger.Update()
 	for obj := range entity.GameObjects {
 		obj.Update()
 	}
