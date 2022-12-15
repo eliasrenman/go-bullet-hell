@@ -1,14 +1,15 @@
-package main
+package constant
 
 const (
-	SCREEN_WIDTH        int     = 900
-	SCREEN_HEIGHT       int     = 700
-	PLAYFIELD_OFFSET    uint8   = 50
-	PLAYFIELD_WIDTH             = 350
-	PLAYFIELD_HEIGHT            = 550
-	INITIAL_PLAYER_X            = PLAYFIELD_WIDTH / 2
-	INITIAL_PLAYER_Y            = (PLAYFIELD_HEIGHT / 5) * 4
-	CONTROLLER_DEADZONE float32 = 0.2
+	SCREEN_WIDTH              int     = 900
+	SCREEN_HEIGHT             int     = 700
+	PLAYFIELD_OFFSET          uint8   = 50
+	PLAYFIELD_WIDTH                   = 500
+	PLAYFIELD_HEIGHT                  = 600
+	INITIAL_PLAYER_X                  = PLAYFIELD_WIDTH / 2
+	INITIAL_PLAYER_Y                  = (PLAYFIELD_HEIGHT / 5) * 4
+	CONTROLLER_DEADZONE       float32 = 0.2
+	STANDARD_BACKGROUND_SPEED         = 3
 )
 
 // Player speeds
@@ -27,7 +28,7 @@ const (
 	REGULAR_GUN = "REGULAR_GUN"
 )
 
-var keyboardBindings = map[string]string{
+var KeyboardBindings = map[string]string{
 	"W":          UP,
 	"S":          DOWN,
 	"A":          LEFT,
@@ -40,7 +41,7 @@ var keyboardBindings = map[string]string{
 	"Z":          REGULAR_GUN,
 }
 
-var controllerBindings = map[string]string{
+var ControllerBindings = map[string]string{
 	// "W":          UP,
 	// "S":          DOWN,
 	// "A":          LEFT,

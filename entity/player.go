@@ -15,33 +15,51 @@ const moveSpeedSlow float64 = 2
 
 type Player struct {
 	BulletOwner
-	Entity
+	*Entity
 
 	// Bullets shot per second
 	ShootSpeed    float64
 	CanShoot      bool
 	lastShootTime time.Time
+
+	Hitbox Hitbox
 }
 
 func NewPlayer(position geometry.Point) *Player {
-	return &Player{
-		Entity: Entity{
-			Position: position,
+	entity := &Entity{
+		Position: position,
+	}
+	player := &Player{
+		Entity: entity,
+		Hitbox: Hitbox{
+			MinPoint: geometry.Point{X: 0, Y: 0},
+			MaxPoint: geometry.Point{X: 1, Y: 1},
+			Entity:   entity,
 		},
 		BulletOwner: NewBulletOwner(),
 		ShootSpeed:  10,
 		CanShoot:    true,
 	}
+	return player
 }
 
 func (player *Player) Start() {}
+
+var gameFieldHitbox = NewFieldHitbox()
 
 func (player *Player) Update() {
 	// Handle movement
 	move := geometry.Vector{
 		X: input.AxisHorizontal.Get(0),
 		Y: -input.AxisVertical.Get(0),
-	}.Normalized()
+	}
+
+	// Make sure to check border colision and cancel out movement.
+	borderColisionVector := gameFieldHitbox.Inside(player.Hitbox)
+	move.Add(borderColisionVector)
+
+	// Make sure to normalise the movement.
+	move.Normalized()
 
 	speed := moveSpeed
 	if input.ButtonSlow.Get(0) {
@@ -50,12 +68,15 @@ func (player *Player) Update() {
 
 	move.Scale(speed)
 	player.Move(move)
+	player.Velocity = move
 
+	// println(colision.X, colision.Y)
 	// Handle shooting
 	if player.CanShoot && input.ButtonShoot.Get(0) {
+		// Normalize the amount of bullets being shot.
 		if time.Since(player.lastShootTime) > time.Second/time.Duration(player.ShootSpeed) {
 			player.Shoot(
-				player.Position,
+				player.Position.Copy().Minus(geometry.Vector{X: 0, Y: 25}),
 				util.DegToRad(-90),
 				6,
 			)
