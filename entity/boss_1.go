@@ -33,12 +33,13 @@ func (boss *BossOne) Draw(screen *ebiten.Image) {
 }
 
 func (boss *BossOne) Start() {
-	CirclePattern.Start(boss.Entity)
+	// CirclePattern.Start(boss.Entity)
+	StaggeredCirclePatternInstance.Start(boss.Entity)
 
 }
 
 func (boss *BossOne) Update() {
-	CirclePattern.Update()
+	StaggeredCirclePatternInstance.Update()
 }
 
 func (boss *BossOne) Die() {
