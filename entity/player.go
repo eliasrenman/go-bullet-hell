@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/eliasrenman/go-bullet-hell/assets"
+	"github.com/eliasrenman/go-bullet-hell/constant"
 	"github.com/eliasrenman/go-bullet-hell/geometry"
 	"github.com/eliasrenman/go-bullet-hell/input"
 	"github.com/eliasrenman/go-bullet-hell/util"
@@ -22,30 +23,38 @@ type Player struct {
 	CanShoot      bool
 	lastShootTime time.Time
 
-	Hitbox Hitbox
+	Hitbox Collider
 }
 
 func NewPlayer(position geometry.Point) *Player {
-	entity := &Entity{
-		Position: position,
-	}
 	player := &Player{
-		Entity: entity,
-		Hitbox: Hitbox{
-			MinPoint: geometry.Point{X: 0, Y: 0},
-			MaxPoint: geometry.Point{X: 1, Y: 1},
-			Entity:   entity,
+		Entity: &Entity{
+			Position: position,
 		},
 		BulletOwner: NewBulletOwner(),
 		ShootSpeed:  10,
 		CanShoot:    true,
 	}
+
+	player.Hitbox = RectangleHitbox{
+		Size: geometry.Size{Width: 1, Height: 1},
+		BaseHitbox: BaseHitbox{
+			Position: player.Position,
+			Owner:    player.Entity,
+		},
+	}
+
 	return player
 }
 
 func (player *Player) Start() {}
 
-var gameFieldHitbox = NewFieldHitbox()
+var gameFieldHitbox = RectangleHitbox{
+	BaseHitbox: BaseHitbox{
+		Position: geometry.Point{X: 0, Y: 0},
+	},
+	Size: geometry.Size{Width: constant.PLAYFIELD_WIDTH, Height: constant.PLAYFIELD_HEIGHT},
+}
 
 func (player *Player) Update() {
 	// Handle movement
@@ -53,10 +62,6 @@ func (player *Player) Update() {
 		X: input.AxisHorizontal.Get(0),
 		Y: -input.AxisVertical.Get(0),
 	}
-
-	// Make sure to check border colision and cancel out movement.
-	borderColisionVector := gameFieldHitbox.Inside(player.Hitbox)
-	move.Add(borderColisionVector)
 
 	// Make sure to normalise the movement.
 	move.Normalized()
@@ -67,8 +72,11 @@ func (player *Player) Update() {
 	}
 
 	move.Scale(speed)
-	player.Move(move)
-	player.Velocity = move
+
+	if player.Hitbox.CollidesAt(player.Position.Plus(move), gameFieldHitbox) {
+		player.Move(move)
+		player.Velocity = move
+	}
 
 	// println(colision.X, colision.Y)
 	// Handle shooting

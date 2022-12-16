@@ -25,7 +25,7 @@ func VectorFromAngle(angle float64) Vector {
 }
 
 // Calculates the magnitude (length) of the vector
-func (vec *Vector) Magnitude() float64 {
+func (vec Vector) Magnitude() float64 {
 	return math.Sqrt(vec.X*vec.X + vec.Y*vec.Y)
 }
 
@@ -58,6 +58,11 @@ func (vec Vector) Normalized() Vector {
 func (vec Vector) Copy() Vector {
 	v := Vector{vec.X, vec.Y}
 	return v
+}
+
+// Calculates the distance between two vectors
+func (a Vector) Distance(b Vector) float64 {
+	return a.Minus(b).Magnitude()
 }
 
 // Pointer arithmetic
