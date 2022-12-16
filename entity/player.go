@@ -14,7 +14,6 @@ const moveSpeed float64 = 4
 const moveSpeedSlow float64 = 2
 
 type Player struct {
-	BulletOwner
 	*Entity
 
 	// Bullets shot per second
@@ -36,9 +35,8 @@ func NewPlayer(position geometry.Point) *Player {
 			MaxPoint: geometry.Point{X: 1, Y: 1},
 			Entity:   entity,
 		},
-		BulletOwner: NewBulletOwner(),
-		ShootSpeed:  10,
-		CanShoot:    true,
+		ShootSpeed: 10,
+		CanShoot:   true,
 	}
 	return player
 }
@@ -87,8 +85,12 @@ func (player *Player) Update() {
 }
 
 func (player *Player) Die() {
-	for bullet := range player.Bullets {
-		Destroy(bullet)
+	// Make sure to clean up all the players bullets
+	for entity := range GameObjects {
+		bullet, ok := entity.(*Bullet)
+		if ok {
+			Destroy(bullet)
+		}
 	}
 }
 
@@ -109,9 +111,4 @@ func (player *Player) Draw(screen *ebiten.Image) {
 	}
 
 	image.Draw(screen, player.Position, geometry.Size{Width: 1, Height: 1}, 0)
-
-	// Draw all bullets on the player
-	for obj := range player.Bullets {
-		obj.Draw(screen)
-	}
 }
