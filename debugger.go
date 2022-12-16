@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/eliasrenman/go-bullet-hell/assets"
+	"github.com/eliasrenman/go-bullet-hell/entity"
 	"github.com/eliasrenman/go-bullet-hell/input"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -68,11 +69,13 @@ func (debugger *Debugger) Draw(screen *ebiten.Image) {
 FPS: %.2f
 Playing since: %v
 Total play time: %v
-Frame time: %v`,
+Frame time: %v,
+Total Game Objects: %v`,
 		debugger.fps,
 		debugger.startTime.Format("January 2 15:04:05"),
 		debugger.totalTime.Truncate(time.Second),
-		debugger.deltaTime.Truncate(time.Millisecond/100))
+		debugger.deltaTime.Truncate(time.Millisecond/100),
+		len(entity.GameObjects))
 
 	text.Draw(screen, debugText, debugger.font, 4, 0, color.White)
 
