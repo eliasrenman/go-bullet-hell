@@ -17,6 +17,7 @@ var GameObjects = make(map[GameObject]struct{})
 // Spawn a new copy of a game object
 func Spawn[T GameObject](obj T) T {
 	GameObjects[obj] = struct{}{}
+	obj.Start()
 	return obj
 }
 

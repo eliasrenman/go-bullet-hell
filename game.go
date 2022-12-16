@@ -22,6 +22,12 @@ func InitalizeGame() *Game {
 		Y: constant.INITIAL_PLAYER_Y,
 	}))
 
+	// Spawn boss
+	entity.Spawn(entity.NewBossOne(geometry.Point{
+		X: constant.INITIAL_PLAYER_X,
+		Y: 200,
+	}))
+
 	game := Game{
 		player: player,
 		background: assets.Background{

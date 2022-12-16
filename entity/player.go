@@ -74,9 +74,10 @@ func (player *Player) Update() {
 		// Normalize the amount of bullets being shot.
 		if time.Since(player.lastShootTime) > time.Second/time.Duration(player.ShootSpeed) {
 			player.Shoot(
-				player.Position.Copy().Minus(geometry.Vector{X: 0, Y: 25}),
+				player.Position.Copy().Minus(geometry.Vector{X: 0, Y: 0}),
 				util.DegToRad(-90),
 				6,
+				25,
 			)
 
 			player.lastShootTime = time.Now()

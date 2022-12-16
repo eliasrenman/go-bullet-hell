@@ -25,7 +25,11 @@ func (b *Bullet) SetAngularVelocity(speed float64, direction float64) {
 	b.Velocity = geometry.VectorFromAngle(direction).ScaledBy(speed)
 }
 
-func (owner *Entity) Shoot(position geometry.Point, direction float64, speed float64) {
+func (owner *Entity) Shoot(position geometry.Point, direction float64, speed float64, offset float64) {
+
+	// This offests the inital position based on the direction of the bullet.
+	position.Add(geometry.VectorFromAngle(direction).ScaledBy(offset))
+
 	bullet := Spawn(&Bullet{
 		Entity: Entity{Position: position},
 		Owner:  owner,
