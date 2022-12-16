@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/eliasrenman/go-bullet-hell/assets"
+	"github.com/eliasrenman/go-bullet-hell/constant"
 	"github.com/eliasrenman/go-bullet-hell/entity"
 	"github.com/eliasrenman/go-bullet-hell/input"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -77,6 +78,6 @@ Total Game Objects: %v`,
 		debugger.deltaTime.Truncate(time.Millisecond/100),
 		len(entity.GameObjects))
 
-	text.Draw(screen, debugText, debugger.font, 4, 0, color.White)
+	text.Draw(screen, debugText, debugger.font, constant.PLAYFIELD_WIDTH+100, 5, color.White)
 
 }
