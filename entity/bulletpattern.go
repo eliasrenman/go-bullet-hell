@@ -126,14 +126,14 @@ func (pattern *StaggeredCirclePattern) updateOffset() {
 		if pattern.bulletOffset != 0 {
 			pattern.bulletOffset--
 		} else {
-			pattern.bulletOffset = pattern.BulletOffsetLimit
+			pattern.bulletOffset = pattern.BulletOffsetLimit - 1
 		}
 
 	} else {
 		if pattern.bulletOffset != pattern.BulletOffsetLimit {
 			pattern.bulletOffset++
 		} else {
-			pattern.bulletOffset = 0
+			pattern.bulletOffset = 1
 
 		}
 	}
@@ -141,13 +141,13 @@ func (pattern *StaggeredCirclePattern) updateOffset() {
 }
 
 func (pattern *StaggeredCirclePattern) SpawnBullets() {
-	count := float64(pattern.Shoot.Count * pattern.BulletOffsetLimit)
+	count := float64(pattern.Shoot.Count)
 	var step = 2. * math.Pi / count
 
-	for i := 0.; i < count; i++ {
-		if math.Mod(i, float64(pattern.bulletOffset)) == 1 {
-			pattern.owner.Shoot(pattern.owner.Position, step*(i), radius, 20)
-		}
+	for i := 0; i < pattern.Shoot.Count; i++ {
+		offset := step / float64(pattern.BulletOffsetLimit)
+		pattern.owner.Shoot(pattern.owner.Position, step*float64(i)+offset*float64(pattern.bulletOffset), radius, 20)
+
 	}
 
 	pattern.lastShootTime = time.Now()
