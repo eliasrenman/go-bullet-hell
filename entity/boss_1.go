@@ -14,10 +14,12 @@ func NewBossOne(position geometry.Point) *BossOne {
 	}
 	boss := &BossOne{
 		Entity: e,
-		Hitbox: Hitbox{
-			MinPoint: geometry.Point{X: 0, Y: 0},
-			MaxPoint: geometry.Point{X: 1, Y: 1},
-			Entity:   e,
+		Hitbox: &RectangleHitbox{
+			Size: geometry.Size{Width: 32, Height: 32},
+			BaseHitbox: BaseHitbox{
+				Position: geometry.Vector{X: -16, Y: -16},
+				Owner:    e,
+			},
 		},
 	}
 	return boss
@@ -25,7 +27,7 @@ func NewBossOne(position geometry.Point) *BossOne {
 
 type BossOne struct {
 	*Entity
-	Hitbox Hitbox
+	Hitbox *RectangleHitbox
 }
 
 func (boss *BossOne) Draw(screen *ebiten.Image) {
