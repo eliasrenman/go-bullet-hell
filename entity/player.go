@@ -15,7 +15,6 @@ const moveSpeed float64 = 4
 const moveSpeedSlow float64 = 2
 
 type Player struct {
-	BulletOwner
 	*Entity
 
 	// Bullets shot per second
@@ -32,9 +31,8 @@ func NewPlayer(position geometry.Point) *Player {
 		Entity: &Entity{
 			Position: position,
 		},
-		BulletOwner: NewBulletOwner(),
-		ShootSpeed:  10,
-		CanShoot:    true,
+		ShootSpeed: 10,
+		CanShoot:   true,
 	}
 
 	player.MoveHitbox = &RectangleHitbox{
@@ -90,9 +88,10 @@ func (player *Player) Update() {
 	if player.CanShoot && input.ButtonShoot.Get(0) {
 		if time.Since(player.lastShootTime) > time.Second/time.Duration(player.ShootSpeed) {
 			player.Shoot(
-				player.Position.Copy().Minus(geometry.Vector{X: 0, Y: 25}),
+				player.Position.Copy().Minus(geometry.Vector{X: 0, Y: 0}),
 				util.DegToRad(-90),
 				6,
+				25,
 			)
 
 			player.lastShootTime = time.Now()
@@ -101,8 +100,12 @@ func (player *Player) Update() {
 }
 
 func (player *Player) Die() {
-	for bullet := range player.Bullets {
-		Destroy(bullet)
+	// Make sure to clean up all the players bullets
+	for entity := range GameObjects {
+		bullet, ok := entity.(*Bullet)
+		if ok {
+			Destroy(bullet)
+		}
 	}
 }
 
@@ -123,14 +126,4 @@ func (player *Player) Draw(screen *ebiten.Image) {
 	}
 
 	image.Draw(screen, player.Position, geometry.Size{Width: 1, Height: 1}, 0)
-
-	// gameFieldHitbox.Draw(screen)
-	if h, ok := player.MoveHitbox.(*RectangleHitbox); ok {
-		h.Draw(screen)
-	}
-
-	// Draw all bullets on the player
-	for obj := range player.Bullets {
-		obj.Draw(screen)
-	}
 }
