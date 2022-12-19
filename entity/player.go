@@ -65,26 +65,31 @@ var gameFieldHitbox = &RectangleHitbox{
 
 func (player *Player) Update() {
 	// Handle movement
-	move := geometry.Vector{
+	moveInput := geometry.Vector{
 		X: input.AxisHorizontal.Get(0),
 		Y: -input.AxisVertical.Get(0),
 	}
-
-	// Make sure to normalise the movement.
-	move.Normalized()
-
-	speed := moveSpeed
-	if input.ButtonSlow.Get(0) {
-		speed = moveSpeedSlow
+	direction := moveInput.Angle()
+	speed := 0.
+	if moveInput.X != 0 || moveInput.Y != 0 {
+		if input.ButtonSlow.Get(0) {
+			speed = moveSpeedSlow
+		} else {
+			speed = moveSpeed
+		}
 	}
 
-	move.Scale(speed)
-
-	if player.MoveHitbox.CollidesAt(player.Position.Plus(move), gameFieldHitbox) {
-		player.Move(move)
-		player.Velocity = move
+	// Allow sliding against walls
+	for i := 0.; i < 60 && i > -60; i = -(i + util.Sign(i)) {
+		mv := geometry.VectorFromAngle(direction + util.DegToRad(i)).ScaledBy(speed)
+		if player.MoveHitbox.CollidesAt(player.Position.Plus(mv), gameFieldHitbox) {
+			player.Velocity = mv
+			player.Move(mv)
+			break
+		}
 	}
 
+	// Handle shooting
 	if player.CanShoot && input.ButtonShoot.Get(0) {
 		if time.Since(player.lastShootTime) > time.Second/time.Duration(player.ShootSpeed) {
 			player.Shoot(

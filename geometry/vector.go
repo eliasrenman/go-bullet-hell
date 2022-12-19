@@ -54,6 +54,10 @@ func (vec Vector) Normalized() Vector {
 	return v
 }
 
+func (vec Vector) Angle() float64 {
+	return math.Atan2(vec.Y, vec.X)
+}
+
 // Creates a copy of the vector
 func (vec Vector) Copy() Vector {
 	v := Vector{vec.X, vec.Y}
