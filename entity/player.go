@@ -23,7 +23,8 @@ type Player struct {
 	CanShoot      bool
 	lastShootTime time.Time
 
-	Hitbox Collider
+	MoveHitbox   Collider
+	DamageHitbox Collider
 }
 
 func NewPlayer(position geometry.Point) *Player {
@@ -36,10 +37,18 @@ func NewPlayer(position geometry.Point) *Player {
 		CanShoot:    true,
 	}
 
-	player.Hitbox = RectangleHitbox{
-		Size: geometry.Size{Width: 1, Height: 1},
+	player.MoveHitbox = &RectangleHitbox{
+		Size: geometry.Size{Width: 32, Height: 32},
 		BaseHitbox: BaseHitbox{
-			Position: player.Position,
+			Position: geometry.Vector{X: -16, Y: -16},
+			Owner:    player.Entity,
+		},
+	}
+
+	player.DamageHitbox = &RectangleHitbox{
+		Size: geometry.Size{Width: 16, Height: 16},
+		BaseHitbox: BaseHitbox{
+			Position: geometry.Vector{},
 			Owner:    player.Entity,
 		},
 	}
@@ -49,11 +58,11 @@ func NewPlayer(position geometry.Point) *Player {
 
 func (player *Player) Start() {}
 
-var gameFieldHitbox = RectangleHitbox{
+var gameFieldHitbox = &RectangleHitbox{
 	BaseHitbox: BaseHitbox{
-		Position: geometry.Point{X: 0, Y: 0},
+		Position: geometry.Vector{X: 32, Y: 32},
 	},
-	Size: geometry.Size{Width: constant.PLAYFIELD_WIDTH, Height: constant.PLAYFIELD_HEIGHT},
+	Size: geometry.Size{Width: constant.PLAYFIELD_WIDTH - 64, Height: constant.PLAYFIELD_HEIGHT - 64},
 }
 
 func (player *Player) Update() {
@@ -73,15 +82,12 @@ func (player *Player) Update() {
 
 	move.Scale(speed)
 
-	if player.Hitbox.CollidesAt(player.Position.Plus(move), gameFieldHitbox) {
+	if player.MoveHitbox.CollidesAt(player.Position.Plus(move), gameFieldHitbox) {
 		player.Move(move)
 		player.Velocity = move
 	}
 
-	// println(colision.X, colision.Y)
-	// Handle shooting
 	if player.CanShoot && input.ButtonShoot.Get(0) {
-		// Normalize the amount of bullets being shot.
 		if time.Since(player.lastShootTime) > time.Second/time.Duration(player.ShootSpeed) {
 			player.Shoot(
 				player.Position.Copy().Minus(geometry.Vector{X: 0, Y: 25}),
@@ -117,6 +123,11 @@ func (player *Player) Draw(screen *ebiten.Image) {
 	}
 
 	image.Draw(screen, player.Position, geometry.Size{Width: 1, Height: 1}, 0)
+
+	// gameFieldHitbox.Draw(screen)
+	if h, ok := player.MoveHitbox.(*RectangleHitbox); ok {
+		h.Draw(screen)
+	}
 
 	// Draw all bullets on the player
 	for obj := range player.Bullets {

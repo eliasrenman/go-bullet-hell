@@ -10,16 +10,16 @@ type CircleHitbox struct {
 	Radius float64
 }
 
-func (a *CircleHitbox) CollidesWithCircle(b CircleHitbox) bool {
-	aCenter := a.Position.Plus(a.Owner.Position)
+func (a *CircleHitbox) CollidesWithCircle(p geometry.Point, b *CircleHitbox) bool {
+	aCenter := a.Position.Plus(p)
 	bCenter := b.Position.Plus(b.Owner.Position)
 
 	return aCenter.Distance(bCenter) < a.Radius+b.Radius
 }
 
-func (a *CircleHitbox) CollidesWithRectangle(b RectangleHitbox) bool {
-	aCenter := a.Position.Plus(a.Owner.Position)
-	bMin, bMax := b.GetRectangle()
+func (a *CircleHitbox) CollidesWithRectangle(p geometry.Point, b *RectangleHitbox) bool {
+	aCenter := a.Position.Plus(p)
+	bMin, bMax := b.GetRectangle(b.Owner.Position)
 
 	// Find the closest point to the circle within the rectangle
 	x := util.ClampFloat(aCenter.X, bMin.X, bMax.X)
@@ -33,16 +33,14 @@ func (a *CircleHitbox) CollidesWithRectangle(b RectangleHitbox) bool {
 }
 
 func (hb CircleHitbox) CollidesWith(other Collider) bool {
-	switch other := other.(type) {
-	case CircleHitbox:
-		return hb.CollidesWithCircle(other)
+	return other.CollidesAt(hb.Owner.Position, &hb)
+}
+
+func (a CircleHitbox) CollidesAt(p geometry.Point, b Collider) bool {
+	switch other := b.(type) {
+	case *CircleHitbox:
+		return a.CollidesWithCircle(p, other)
 	default:
 		return false
 	}
-}
-
-func (hb CircleHitbox) CollidesAt(p geometry.Point, other Collider) bool {
-	hb.Position.Add(p)
-	defer hb.Position.Subtract(p)
-	return hb.CollidesWith(other)
 }
