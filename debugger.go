@@ -12,14 +12,15 @@ import (
 )
 
 type Debugger struct {
-	Visible     bool
-	Game        *Game
-	font        font.Face
-	fps         float64
-	deltaTime   time.Duration
-	totalTime   time.Duration
-	startTime   time.Time
-	graphicslib ebiten.GraphicsLibrary
+	Visible         bool
+	Game            *Game
+	font            font.Face
+	fps             float64
+	deltaTime       time.Duration
+	totalTime       time.Duration
+	startTime       time.Time
+	graphicsLibrary ebiten.GraphicsLibrary
+	cursorPosition  Vector
 }
 
 func NewDebugger(game *Game) *Debugger {
@@ -38,7 +39,12 @@ func (debugger *Debugger) Update() error {
 	// Toggle debug mode
 	if ButtonDebug.GetPressed(0) {
 		debugger.Visible = !debugger.Visible
-		fmt.Printf("Debug mode: %v\n", debugger.Visible)
+
+		if debugger.Visible {
+			debugger.Start()
+		} else {
+			debugger.Stop()
+		}
 	}
 
 	debugger.fps = ebiten.ActualFPS()
@@ -49,12 +55,24 @@ func (debugger *Debugger) Update() error {
 
 	var debugInfo ebiten.DebugInfo
 	ebiten.ReadDebugInfo(&debugInfo)
-	debugger.graphicslib = debugInfo.GraphicsLibrary
+	debugger.graphicsLibrary = debugInfo.GraphicsLibrary
+
+	x, y := ebiten.CursorPosition()
+	debugger.cursorPosition = Vector{X: float64(x), Y: float64(y)}
 
 	return nil
 }
 
-func init() {
+var crosshairImage = LoadImage("crosshair.png", OriginCenter)
+
+func (debugger *Debugger) Start() {
+	ebiten.SetCursorMode(ebiten.CursorModeHidden)
+	fmt.Println("Debug mode enabled")
+}
+
+func (debugger *Debugger) Stop() {
+	ebiten.SetCursorMode(ebiten.CursorModeVisible)
+	fmt.Println("Debug mode disabled")
 }
 
 func (debugger *Debugger) Draw(screen *ebiten.Image) {
@@ -62,17 +80,42 @@ func (debugger *Debugger) Draw(screen *ebiten.Image) {
 		return
 	}
 
+	// Draw debug text
 	debugText := fmt.Sprintf(`
 FPS: %.2f
 Playing since: %v
 Total play time: %v
 Frame time: %v,
-Total Game Objects: %v`,
+Total Game Objects: %v
+Running on %v`,
 		debugger.fps,
 		debugger.startTime.Format("January 2 15:04:05"),
 		debugger.totalTime.Truncate(time.Second),
 		debugger.deltaTime.Truncate(time.Millisecond/100),
-		len(GameObjects))
+		len(GameObjects),
+		getGraphicsLibraryName(int(debugger.graphicsLibrary)))
 
 	text.Draw(screen, debugText, debugger.font, int(PlayfieldSize.X)+100, 5, color.White)
+
+	// Draw crosshair
+	crosshairImage.Draw(screen, debugger.cursorPosition, Vector{X: 1, Y: 1}, 0)
+	crosshairText := fmt.Sprintf(
+		"%v, %v",
+		debugger.cursorPosition.X-PlayfieldOffset.X,
+		debugger.cursorPosition.Y-PlayfieldOffset.Y,
+	)
+	text.Draw(screen, crosshairText, debugger.font, int(debugger.cursorPosition.X)+4, int(debugger.cursorPosition.Y)-4, color.White)
+}
+
+func getGraphicsLibraryName(gl int) string {
+	switch gl {
+	case 1:
+		return "OpenGL"
+	case 2:
+		return "Metal"
+	case 3:
+		return "DirectX"
+	default:
+		return "Unknown"
+	}
 }
