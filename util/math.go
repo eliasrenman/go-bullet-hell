@@ -34,3 +34,10 @@ var startMillis = time.Now().UnixMilli()
 func CurrentSeconds() float64 {
 	return float64(time.Now().UnixMilli()-startMillis) / 1000
 }
+
+func Sign(value float64) float64 {
+	if value < 0 {
+		return -1
+	}
+	return 1
+}

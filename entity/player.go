@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/eliasrenman/go-bullet-hell/assets"
+	"github.com/eliasrenman/go-bullet-hell/constant"
 	"github.com/eliasrenman/go-bullet-hell/geometry"
 	"github.com/eliasrenman/go-bullet-hell/input"
 	"github.com/eliasrenman/go-bullet-hell/util"
@@ -21,57 +22,75 @@ type Player struct {
 	CanShoot      bool
 	lastShootTime time.Time
 
-	Hitbox Hitbox
+	MoveHitbox   Collider
+	DamageHitbox Collider
 }
 
 func NewPlayer(position geometry.Point) *Player {
-	entity := &Entity{
-		Position: position,
-	}
 	player := &Player{
-		Entity: entity,
-		Hitbox: Hitbox{
-			MinPoint: geometry.Point{X: 0, Y: 0},
-			MaxPoint: geometry.Point{X: 1, Y: 1},
-			Entity:   entity,
+		Entity: &Entity{
+			Position: position,
 		},
 		ShootSpeed: 10,
 		CanShoot:   true,
 	}
+
+	player.MoveHitbox = &RectangleHitbox{
+		Size: geometry.Size{Width: 32, Height: 32},
+		BaseHitbox: BaseHitbox{
+			Position: geometry.Vector{X: -16, Y: -16},
+			Owner:    player.Entity,
+		},
+	}
+
+	player.DamageHitbox = &RectangleHitbox{
+		Size: geometry.Size{Width: 16, Height: 16},
+		BaseHitbox: BaseHitbox{
+			Position: geometry.Vector{},
+			Owner:    player.Entity,
+		},
+	}
+
 	return player
 }
 
 func (player *Player) Start() {}
 
-var gameFieldHitbox = NewFieldHitbox()
+var gameFieldHitbox = &RectangleHitbox{
+	BaseHitbox: BaseHitbox{
+		Position: geometry.Vector{X: 32, Y: 32},
+	},
+	Size: geometry.Size{Width: constant.PLAYFIELD_WIDTH - 64, Height: constant.PLAYFIELD_HEIGHT - 64},
+}
 
 func (player *Player) Update() {
 	// Handle movement
-	move := geometry.Vector{
+	moveInput := geometry.Vector{
 		X: input.AxisHorizontal.Get(0),
 		Y: -input.AxisVertical.Get(0),
 	}
-
-	// Make sure to check border colision and cancel out movement.
-	borderColisionVector := gameFieldHitbox.Inside(player.Hitbox)
-	move.Add(borderColisionVector)
-
-	// Make sure to normalise the movement.
-	move.Normalized()
-
-	speed := moveSpeed
-	if input.ButtonSlow.Get(0) {
-		speed = moveSpeedSlow
+	direction := moveInput.Angle()
+	speed := 0.
+	if moveInput.X != 0 || moveInput.Y != 0 {
+		if input.ButtonSlow.Get(0) {
+			speed = moveSpeedSlow
+		} else {
+			speed = moveSpeed
+		}
 	}
 
-	move.Scale(speed)
-	player.Move(move)
-	player.Velocity = move
+	// Allow sliding against walls
+	for i := 0.; i < 60 && i > -60; i = -(i + util.Sign(i)) {
+		mv := geometry.VectorFromAngle(direction + util.DegToRad(i)).ScaledBy(speed)
+		if player.MoveHitbox.CollidesAt(player.Position.Plus(mv), gameFieldHitbox) {
+			player.Velocity = mv
+			player.Move(mv)
+			break
+		}
+	}
 
-	// println(colision.X, colision.Y)
 	// Handle shooting
 	if player.CanShoot && input.ButtonShoot.Get(0) {
-		// Normalize the amount of bullets being shot.
 		if time.Since(player.lastShootTime) > time.Second/time.Duration(player.ShootSpeed) {
 			player.Shoot(
 				player.Position.Copy().Minus(geometry.Vector{X: 0, Y: 0}),
