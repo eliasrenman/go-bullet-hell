@@ -3,7 +3,7 @@ package constant
 const (
 	SCREEN_WIDTH              int     = 900
 	SCREEN_HEIGHT             int     = 700
-	PLAYFIELD_OFFSET          uint8   = 50
+	PLAYFIELD_OFFSET          int     = 50
 	PLAYFIELD_WIDTH                   = 500
 	PLAYFIELD_HEIGHT                  = 600
 	INITIAL_PLAYER_X                  = PLAYFIELD_WIDTH / 2
