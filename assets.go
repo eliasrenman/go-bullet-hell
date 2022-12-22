@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 
+	_ "image/png"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
@@ -26,7 +28,7 @@ func (background *Background) Update() {
 }
 
 func (background *Background) Draw(screen *ebiten.Image) {
-	background.Image.DrawTiled(screen, Point{}, Size{Width: 2, Height: 2}, 0, background.offset)
+	background.Image.DrawTiled(screen, Vector{}, Vector{X: 2, Y: 2}, 0, background.offset)
 
 }
 
@@ -35,7 +37,7 @@ type Font struct {
 }
 
 func LoadFont(path string, op opentype.FaceOptions) *Font {
-	data, err := Assets.ReadFile("data/" + path)
+	data, err := Assets.ReadFile("assets/" + path)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,25 +68,25 @@ func LoadFont(path string, op opentype.FaceOptions) *Font {
 }
 
 var (
-	OriginTop         = Point{X: 0.5, Y: 0}
-	OriginTopLeft     = Point{X: 0, Y: 0}
-	OriginTopRight    = Point{X: 1, Y: 0}
-	OriginCenter      = Point{X: 0.5, Y: 0.5}
-	OriginLeft        = Point{X: 0, Y: 0.5}
-	OriginRight       = Point{X: 1, Y: 0.5}
-	OriginBottom      = Point{X: 0.5, Y: 1}
-	OriginBottomLeft  = Point{X: 0, Y: 1}
-	OriginBottomRight = Point{X: 1, Y: 1}
+	OriginTop         = Vector{X: 0.5, Y: 0}
+	OriginTopLeft     = Vector{X: 0, Y: 0}
+	OriginTopRight    = Vector{X: 1, Y: 0}
+	OriginCenter      = Vector{X: 0.5, Y: 0.5}
+	OriginLeft        = Vector{X: 0, Y: 0.5}
+	OriginRight       = Vector{X: 1, Y: 0.5}
+	OriginBottom      = Vector{X: 0.5, Y: 1}
+	OriginBottomLeft  = Vector{X: 0, Y: 1}
+	OriginBottomRight = Vector{X: 1, Y: 1}
 )
 
 type Image struct {
 	*ebiten.Image
-	Size   Size
-	Origin Point
+	Size   Vector
+	Origin Vector
 }
 
-func LoadImage(path string, origin Point) *Image {
-	data, err := Assets.Open("data/" + path)
+func LoadImage(path string, origin Vector) *Image {
+	data, err := Assets.Open("assets/" + path)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -99,38 +101,30 @@ func LoadImage(path string, origin Point) *Image {
 	width, height := image.Size()
 	return &Image{
 		Image: image,
-		Size: Size{
-			Width:  float64(width),
-			Height: float64(height),
+		Size: Vector{
+			X: float64(width),
+			Y: float64(height),
 		},
 		Origin: origin,
 	}
 }
 
-func TranslateScaleAndRotateImage(geom *ebiten.GeoM, position Point, scale Size, rotation float64) {
+func TranslateScaleAndRotateImage(geom *ebiten.GeoM, position Vector, scale Vector, rotation float64) {
 	geom.Translate(position.X, position.Y)
-	geom.Scale(float64(scale.Width), float64(scale.Height))
+	geom.Scale(float64(scale.X), float64(scale.Y))
 	geom.Rotate(rotation)
 }
 
-func (image *Image) Draw(target *ebiten.Image, position Point, scale Size, rotation float64) {
+func (image *Image) Draw(target *ebiten.Image, position Vector, scale Vector, rotation float64) {
 	op := &ebiten.DrawImageOptions{}
-
-	// This moves the inital drawing offset.
-	position.Add(WORLD_ORIGIN)
-	position.Subtract(image.Origin.Dot(Vector{
-		X: image.Size.Width,
-		Y: image.Size.Height,
-	}))
-
+	position.Subtract(image.Origin.Dot(image.Size))
 	TranslateScaleAndRotateImage(&op.GeoM, position, scale, rotation)
-
 	target.DrawImage(image.Image, op)
 }
 
 var tilingShader = LoadShader("shaders/tile.go")
 
-func (image *Image) DrawTiled(target *ebiten.Image, position Point, scale Size, rotation float64, offset Vector) {
+func (image *Image) DrawTiled(target *ebiten.Image, position Vector, scale Vector, rotation float64, offset Vector) {
 	images := []*Image{image}
 	uniforms := map[string]any{
 		"Offset": []float32{float32(offset.X), float32(offset.Y)},
@@ -143,7 +137,7 @@ type Shader struct {
 }
 
 func LoadShader(path string) *Shader {
-	file, err := Assets.Open("data/" + path)
+	file, err := Assets.Open("assets/" + path)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -163,7 +157,7 @@ func LoadShader(path string) *Shader {
 	}
 }
 
-func (shader *Shader) Draw(target *ebiten.Image, position Point, scale Size, rotation float64, images []*Image, uniforms map[string]any) {
+func (shader *Shader) Draw(target *ebiten.Image, position Vector, scale Vector, rotation float64, images []*Image, uniforms map[string]any) {
 	op := &ebiten.DrawRectShaderOptions{}
 	width := target.Bounds().Dx()
 	height := target.Bounds().Dy()

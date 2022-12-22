@@ -13,22 +13,16 @@ type Game struct {
 var backgroundImage = LoadImage("bg/img1.png", OriginTopLeft)
 
 func InitalizeGame() *Game {
-	player := Spawn(NewPlayer(Point{
-		X: INITIAL_PLAYER_X,
-		Y: INITIAL_PLAYER_Y,
-	}))
+	player := Spawn(NewPlayer(PlayerStart))
 
 	// Spawn boss
-	Spawn(NewBossOne(Point{
-		X: INITIAL_PLAYER_X,
-		Y: 200,
-	}))
+	Spawn(NewBossOne(PlayfieldSize.Dot(OriginTop).Plus(Vector{Y: 100})))
 
 	game := Game{
 		player: player,
 		background: Background{
 			Image:    backgroundImage,
-			Velocity: Up.ScaledBy(STANDARD_BACKGROUND_SPEED),
+			Velocity: Up.ScaledBy(BackgroundSpeed),
 		},
 		debugger: nil,
 	}
@@ -50,13 +44,13 @@ func (game *Game) Draw(screen *ebiten.Image) {
 	game.debugger.Draw(screen)
 }
 
-var gameView = ebiten.NewImage(PLAYFIELD_WIDTH, PLAYFIELD_HEIGHT)
+var gameView = ebiten.NewImage(int(PlayfieldSize.X), int(PlayfieldSize.Y))
 
 func DrawGameView(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	position := Point{X: float64(PLAYFIELD_OFFSET), Y: float64(PLAYFIELD_OFFSET)}
+	position := PlayfieldOffset
 
-	TranslateScaleAndRotateImage(&op.GeoM, position, Size{Width: 1, Height: 1}, 0)
+	TranslateScaleAndRotateImage(&op.GeoM, position, Vector{X: 1, Y: 1}, 0)
 
 	screen.DrawImage(gameView, op)
 }
@@ -76,9 +70,9 @@ func (game *Game) Update() error {
 
 func updateGameBackgroundSpeed(game *Game) {
 	if game.player.Velocity.Y != 0 {
-		offsetVelocity := ((game.player.Velocity.Y * -1) + PLAYER_SPEED) / 2
+		offsetVelocity := game.player.Velocity.Y*-0.5 + PlayerSpeed/2
 		game.background.Velocity = Up.ScaledBy(offsetVelocity + 1)
 	} else {
-		game.background.Velocity = Up.ScaledBy(STANDARD_BACKGROUND_SPEED)
+		game.background.Velocity = Up.ScaledBy(BackgroundSpeed)
 	}
 }

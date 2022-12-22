@@ -21,7 +21,7 @@ type Player struct {
 	DamageHitbox Collider
 }
 
-func NewPlayer(position Point) *Player {
+func NewPlayer(position Vector) *Player {
 	player := &Player{
 		Entity: &Entity{
 			Position: position,
@@ -31,7 +31,7 @@ func NewPlayer(position Point) *Player {
 	}
 
 	player.MoveHitbox = &RectangleHitbox{
-		Size: Size{Width: 32, Height: 32},
+		Size: Vector{X: 32, Y: 32},
 		BaseHitbox: BaseHitbox{
 			Position: Vector{X: -16, Y: -16},
 			Owner:    player.Entity,
@@ -39,7 +39,7 @@ func NewPlayer(position Point) *Player {
 	}
 
 	player.DamageHitbox = &RectangleHitbox{
-		Size: Size{Width: 16, Height: 16},
+		Size: Vector{X: 16, Y: 16},
 		BaseHitbox: BaseHitbox{
 			Position: Vector{},
 			Owner:    player.Entity,
@@ -55,7 +55,7 @@ var gameFieldHitbox = &RectangleHitbox{
 	BaseHitbox: BaseHitbox{
 		Position: Vector{X: 32, Y: 32},
 	},
-	Size: Size{Width: PLAYFIELD_WIDTH - 64, Height: PLAYFIELD_HEIGHT - 64},
+	Size: PlayfieldSize.Minus(Vector{X: 64, Y: 64}),
 }
 
 func (player *Player) Update() {
@@ -125,5 +125,5 @@ func (player *Player) Draw(screen *ebiten.Image) {
 		image = playerRightImage
 	}
 
-	image.Draw(screen, player.Position, Size{Width: 1, Height: 1}, 0)
+	image.Draw(screen, player.Position, Vector{X: 1, Y: 1}, 0)
 }

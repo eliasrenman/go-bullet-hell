@@ -9,14 +9,14 @@ import (
 
 var bossOneImage = LoadImage("characters/boss_one.png", OriginCenter)
 
-func NewBossOne(position Point) *BossOne {
+func NewBossOne(position Vector) *BossOne {
 	e := &Entity{
 		Position: position,
 	}
 	boss := &BossOne{
 		Entity: e,
 		Hitbox: &RectangleHitbox{
-			Size: Size{Width: 32, Height: 32},
+			Size: Vector{X: 32, Y: 32},
 			BaseHitbox: BaseHitbox{
 				Position: Vector{X: -16, Y: -16},
 				Owner:    e,
@@ -32,7 +32,7 @@ type BossOne struct {
 }
 
 func (boss *BossOne) Draw(screen *ebiten.Image) {
-	bossOneImage.Draw(screen, boss.Position, Size{Width: 1, Height: 1}, 0)
+	bossOneImage.Draw(screen, boss.Position, Vector{X: 1, Y: 1}, 0)
 }
 
 var schedule = Schedule{

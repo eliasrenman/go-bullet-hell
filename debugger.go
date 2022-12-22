@@ -74,6 +74,5 @@ Total Game Objects: %v`,
 		debugger.deltaTime.Truncate(time.Millisecond/100),
 		len(GameObjects))
 
-	text.Draw(screen, debugText, debugger.font, PLAYFIELD_WIDTH+100, 5, color.White)
-
+	text.Draw(screen, debugText, debugger.font, int(PlayfieldSize.X)+100, 5, color.White)
 }

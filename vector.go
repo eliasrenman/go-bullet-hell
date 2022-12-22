@@ -15,8 +15,6 @@ var (
 	Right = Vector{X: 1, Y: 0}
 )
 
-type Point = Vector
-
 func VectorFromAngle(angle float64) Vector {
 	return Vector{
 		X: math.Cos(angle),
