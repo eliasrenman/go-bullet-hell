@@ -106,12 +106,12 @@ func (player *Player) Update() {
 
 func (player *Player) Die() {
 	// Make sure to clean up all the players bullets
-	for entity := range GameObjects {
-		bullet, ok := entity.(*Bullet)
-		if ok {
+	EachGameObject(func(obj GameObject) {
+		bullet, ok := obj.(*Bullet)
+		if ok && bullet.Entity == *player.Entity {
 			Destroy(bullet)
 		}
-	}
+	})
 }
 
 var (

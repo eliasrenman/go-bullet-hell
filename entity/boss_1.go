@@ -1,6 +1,9 @@
 package entity
 
 import (
+	"math"
+	"time"
+
 	"github.com/eliasrenman/go-bullet-hell/assets"
 	"github.com/eliasrenman/go-bullet-hell/geometry"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -34,14 +37,38 @@ func (boss *BossOne) Draw(screen *ebiten.Image) {
 	bossOneImage.Draw(screen, boss.Position, geometry.Size{Width: 1, Height: 1}, 0)
 }
 
-func (boss *BossOne) Start() {
-	// CirclePattern.Start(boss.Entity)
-	StaggeredCirclePatternInstance.Start(boss.Entity)
+var schedule = Schedule{
+	Patterns: []Pattern{
+		{
+			Type: "arc",
+			Options: map[string]interface{}{
+				"count": 30,
+				"speed": 1.0,
+				"from":  0.25 * math.Pi,
+				"to":    0.75 * math.Pi,
+			},
+			Duration: 1 * time.Second,
+			Cooldown: 1 * time.Second,
+		},
+		{
+			Type: "staggeredCircle",
+			Options: map[string]interface{}{
+				"count": 30,
+				"speed": 1.0,
+				"from":  0 * math.Pi,
+				"to":    2 * math.Pi,
+			},
+			Duration: 1 * time.Second,
+			Cooldown: 1 * time.Second,
+		},
+	},
+}
 
+func (boss *BossOne) Start() {
 }
 
 func (boss *BossOne) Update() {
-	StaggeredCirclePatternInstance.Update()
+	schedule.Update(boss.Entity)
 }
 
 func (boss *BossOne) Die() {

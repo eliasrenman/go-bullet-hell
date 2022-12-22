@@ -47,9 +47,9 @@ func (game *Game) Draw(screen *ebiten.Image) {
 	game.background.Draw(gameView)
 
 	// Draw game objects
-	for obj := range entity.GameObjects {
+	entity.EachGameObject(func(obj entity.GameObject) {
 		obj.Draw(gameView)
-	}
+	})
 	DrawGameView(screen)
 	game.debugger.Draw(screen)
 }
@@ -69,9 +69,12 @@ func (game *Game) Update() error {
 	updateGameBackgroundSpeed(game)
 	game.background.Update()
 	game.debugger.Update()
-	for obj := range entity.GameObjects {
+
+	entity.EachGameObject(func(obj entity.GameObject) {
 		obj.Update()
-	}
+	})
+
+	entity.SpawnGameObjects()
 	return nil
 }
 
