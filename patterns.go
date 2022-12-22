@@ -1,50 +1,104 @@
 package main
 
 import (
+	"fmt"
+	"math"
 	"time"
+
+	"github.com/fogleman/ease"
 )
 
-type Pattern struct {
-	Type    string
-	Options map[string]interface{}
+var easings = map[string]func(float64) float64{
+	"linear_in":   ease.Linear,
+	"linear_out":  ease.Linear,
+	"linear":      ease.Linear,
+	"quad_in":     ease.InQuad,
+	"quad_out":    ease.OutQuad,
+	"quad":        ease.InOutQuad,
+	"cube_in":     ease.InCubic,
+	"cube_out":    ease.OutCubic,
+	"cube":        ease.InOutCubic,
+	"quart_in":    ease.InQuart,
+	"quart_out":   ease.OutQuart,
+	"quart":       ease.InOutQuart,
+	"quint_in":    ease.InQuint,
+	"quint_out":   ease.OutQuint,
+	"quint":       ease.InOutQuint,
+	"sine_in":     ease.InSine,
+	"sine_out":    ease.OutSine,
+	"sine":        ease.InOutSine,
+	"expo_in":     ease.InExpo,
+	"expo_out":    ease.OutExpo,
+	"expo":        ease.InOutExpo,
+	"circ_in":     ease.InCirc,
+	"circ_out":    ease.OutCirc,
+	"circ":        ease.InOutCirc,
+	"back_in":     ease.InBack,
+	"back_out":    ease.OutBack,
+	"back":        ease.InOutBack,
+	"elastic_in":  ease.InElastic,
+	"elastic_out": ease.OutElastic,
+	"elastic":     ease.InOutElastic,
+	"bounce_in":   ease.InBounce,
+	"bounce_out":  ease.OutBounce,
+	"bounce":      ease.InOutBounce,
+}
 
+type Pattern struct {
+	Type     string
+	Options  map[string]any
 	Duration time.Duration
 	Cooldown time.Duration
 }
 
-func (pattern *Pattern) Start(entity *Entity) {
-	switch pattern.Type {
-	case "staggeredCircle":
-		go pattern.staggeredCirclePattern(entity)
+func (p *Pattern) Option(key string, defaultValue any) any {
+	if value, ok := p.Options[key]; ok {
+		return value
+	}
+	return defaultValue
+}
 
-	case "arc":
-		go pattern.arcPattern(entity)
+func (p *Pattern) Start(entity *Entity) {
+	switch p.Type {
+	case "shoot_arc":
+		go p.shootArcPattern(entity)
+	case "move_to":
+		go p.moveToPattern(entity)
 	}
 }
 
-func (p *Pattern) arcPattern(entity *Entity) {
-	count := p.Options["count"].(int)
-	speed := p.Options["speed"].(float64)
-	from := p.Options["from"].(float64)
-	to := p.Options["to"].(float64)
+func (p *Pattern) shootArcPattern(entity *Entity) {
+	count := p.Option("count", 1).(int)
+	speed := p.Option("speed", 1.0).(float64)
+	from := p.Option("from", 0.0).(float64)
+	to := p.Option("to", 2*math.Pi).(float64)
+	stagger := p.Option("stagger", 0.0).(float64)
 
 	for i := 0; i < count; i++ {
 		angle := from + (to-from)/float64(count)*float64(i)
 		entity.Shoot(entity.Position, angle, speed, 0)
+		time.Sleep(time.Duration(stagger * float64(time.Second.Nanoseconds())))
 	}
 }
 
-func (p *Pattern) staggeredCirclePattern(entity *Entity) {
-	count := p.Options["count"].(int)
-	speed := p.Options["speed"].(float64)
-	from := p.Options["from"].(float64)
-	to := p.Options["to"].(float64)
+func (p *Pattern) moveToPattern(entity *Entity) {
+	target := p.Option("target", Vector{}).(Vector)
+	speed := p.Option("speed", 1.0).(float64)
+	easing := p.Option("easing", "linear").(string)
 
-	for i := 0; i < count; i++ {
-		angle := from + (to-from)/float64(count)*float64(i)
-		entity.Shoot(entity.Position, angle, speed, 0)
+	easeFn := easings[easing]
 
-		time.Sleep(p.Duration / time.Duration(count))
+	if easeFn == nil {
+		panic(fmt.Sprintf("Invalid easing function: %s", easing))
+	}
+
+	startTime := time.Now()
+	start := entity.Position.Copy()
+	distance := target.Distance(entity.Position)
+
+	for i := 0.0; i < distance; i = speed * time.Since(startTime).Seconds() {
+		entity.Position = start.Plus(target.Minus(start).ScaledBy(easeFn(i / distance)))
+		time.Sleep(time.Duration((1.0 / 60) * time.Second.Seconds()))
 	}
 }
 

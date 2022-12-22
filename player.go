@@ -17,8 +17,8 @@ type Player struct {
 	CanShoot      bool
 	lastShootTime time.Time
 
-	MoveHitbox   Collider
-	DamageHitbox Collider
+	MoveHitbox   Collidable
+	DamageHitbox Collidable
 }
 
 func NewPlayer(position Vector) *Player {
@@ -32,7 +32,7 @@ func NewPlayer(position Vector) *Player {
 
 	player.MoveHitbox = &RectangleHitbox{
 		Size: Vector{X: 32, Y: 32},
-		BaseHitbox: BaseHitbox{
+		Hitbox: Hitbox{
 			Position: Vector{X: -16, Y: -16},
 			Owner:    player.Entity,
 		},
@@ -40,7 +40,7 @@ func NewPlayer(position Vector) *Player {
 
 	player.DamageHitbox = &RectangleHitbox{
 		Size: Vector{X: 16, Y: 16},
-		BaseHitbox: BaseHitbox{
+		Hitbox: Hitbox{
 			Position: Vector{},
 			Owner:    player.Entity,
 		},
@@ -52,7 +52,7 @@ func NewPlayer(position Vector) *Player {
 func (player *Player) Start() {}
 
 var gameFieldHitbox = &RectangleHitbox{
-	BaseHitbox: BaseHitbox{
+	Hitbox: Hitbox{
 		Position: Vector{X: 32, Y: 32},
 	},
 	Size: PlayfieldSize.Minus(Vector{X: 64, Y: 64}),
@@ -77,7 +77,7 @@ func (player *Player) Update() {
 	// Allow sliding against walls
 	for i := 0.; i < 60 && i > -60; i = -(i + Sign(i)) {
 		mv := VectorFromAngle(direction + DegToRad(i)).ScaledBy(speed)
-		if player.MoveHitbox.CollidesAt(player.Position.Plus(mv), gameFieldHitbox) {
+		if CollidesAt(player.MoveHitbox, player.Position.Plus(mv), gameFieldHitbox, Vector{}) {
 			player.Velocity = mv
 			player.Move(mv)
 			break
@@ -101,12 +101,12 @@ func (player *Player) Update() {
 
 func (player *Player) Die() {
 	// Make sure to clean up all the players bullets
-	EachGameObject(func(obj GameObject) {
+	for obj := range GameObjects {
 		bullet, ok := obj.(*Bullet)
 		if ok && bullet.Entity == *player.Entity {
 			Destroy(bullet)
 		}
-	})
+	}
 }
 
 var (
