@@ -55,7 +55,9 @@ type Schedule struct {
 }
 
 func (schedule *Schedule) Update(entity *Entity) {
-	if time.Since(schedule.lastPlayTime) > schedule.Patterns[schedule.index].Duration+schedule.Patterns[schedule.index].Cooldown {
+	lastPattern := schedule.Patterns[(schedule.index+len(schedule.Patterns)-1)%len(schedule.Patterns)]
+
+	if time.Since(schedule.lastPlayTime) > lastPattern.Duration+lastPattern.Cooldown {
 		schedule.Patterns[schedule.index].Start(entity)
 		schedule.index = (schedule.index + 1) % len(schedule.Patterns)
 		schedule.lastPlayTime = time.Now()

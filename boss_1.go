@@ -56,7 +56,7 @@ var schedule = Schedule{
 				"from":  0 * math.Pi,
 				"to":    2 * math.Pi,
 			},
-			Duration: 1 * time.Second,
+			Duration: 2000 * time.Millisecond,
 			Cooldown: 1 * time.Second,
 		},
 	},
