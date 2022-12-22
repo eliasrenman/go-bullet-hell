@@ -1,9 +1,6 @@
-package entity
+package main
 
 import (
-	"github.com/eliasrenman/go-bullet-hell/assets"
-	"github.com/eliasrenman/go-bullet-hell/constant"
-	"github.com/eliasrenman/go-bullet-hell/geometry"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -22,13 +19,13 @@ type Bullet struct {
 func (b *Bullet) SetAngularVelocity(speed float64, direction float64) {
 	b.Speed = speed
 	b.Direction = direction
-	b.Velocity = geometry.VectorFromAngle(direction).ScaledBy(speed)
+	b.Velocity = VectorFromAngle(direction).ScaledBy(speed)
 }
 
-func (owner *Entity) Shoot(position geometry.Point, direction float64, speed float64, offset float64) {
+func (owner *Entity) Shoot(position Point, direction float64, speed float64, offset float64) {
 
 	// This offests the inital position based on the direction of the bullet.
-	position.Add(geometry.VectorFromAngle(direction).ScaledBy(offset))
+	position.Add(VectorFromAngle(direction).ScaledBy(offset))
 
 	bullet := Spawn(&Bullet{
 		Entity: Entity{Position: position},
@@ -42,16 +39,16 @@ func (b *Bullet) Start() {}
 
 func (b *Bullet) Update() {
 	b.Move(b.Velocity)
-	if b.Position.Y < 0 || b.Position.Y > float64(constant.SCREEN_HEIGHT) {
+	if b.Position.Y < 0 || b.Position.Y > float64(SCREEN_HEIGHT) {
 
 		Destroy(b)
 	}
 }
 
-var bulletImage = assets.LoadImage("bullets/bullet.png", assets.OriginCenter)
+var bulletImage = LoadImage("bullets/bullet.png", OriginCenter)
 
 func (b *Bullet) Draw(screen *ebiten.Image) {
-	bulletImage.Draw(screen, b.Position, geometry.Size{Width: 1, Height: 1}, 0)
+	bulletImage.Draw(screen, b.Position, Size{Width: 1, Height: 1}, 0)
 }
 
 func (b *Bullet) Die() {

@@ -1,4 +1,4 @@
-package geometry
+package main
 
 type Size struct {
 	Width  float64

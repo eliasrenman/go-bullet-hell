@@ -1,4 +1,4 @@
-package constant
+package main
 
 const (
 	SCREEN_WIDTH              int     = 900
