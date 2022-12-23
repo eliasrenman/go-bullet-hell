@@ -9,6 +9,7 @@ import (
 const moveSpeed float64 = 4
 const moveSpeedSlow float64 = 2
 
+// Player is the player character
 type Player struct {
 	*Entity
 
@@ -21,6 +22,7 @@ type Player struct {
 	DamageHitbox Collidable
 }
 
+// NewPlayer creates a new player instance
 func NewPlayer(position Vector) *Player {
 	player := &Player{
 		Entity: &Entity{
@@ -49,6 +51,7 @@ func NewPlayer(position Vector) *Player {
 	return player
 }
 
+// Start is called when the player is added to the game
 func (player *Player) Start() {}
 
 var gameFieldHitbox = &RectangleHitbox{
@@ -58,6 +61,7 @@ var gameFieldHitbox = &RectangleHitbox{
 	Size: PlayfieldSize.Minus(Vector{X: 64, Y: 64}),
 }
 
+// Update is called every game tick, and handles player behavior
 func (player *Player) Update() {
 	// Handle movement
 	moveInput := Vector{
@@ -99,6 +103,7 @@ func (player *Player) Update() {
 	}
 }
 
+// Die is called when the player dies
 func (player *Player) Die() {
 	// Make sure to clean up all the players bullets
 	for obj := range GameObjects {
@@ -115,6 +120,7 @@ var (
 	playerRightImage = LoadImage("characters/player_right.png", OriginCenter)
 )
 
+// Draw is called every frame to draw the player
 func (player *Player) Draw(screen *ebiten.Image) {
 	hAxis := AxisHorizontal.Get(0)
 	image := playerImage

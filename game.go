@@ -4,6 +4,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// Game is the main game instance
 type Game struct {
 	player     *Player
 	debugger   *Debugger
@@ -12,7 +13,8 @@ type Game struct {
 
 var backgroundImage = LoadImage("bg/img1.png", OriginTopLeft)
 
-func InitalizeGame() *Game {
+// NewGame creates a new game instance
+func NewGame() *Game {
 	player := Spawn(NewPlayer(PlayerStart))
 
 	// Spawn boss
@@ -32,6 +34,7 @@ func InitalizeGame() *Game {
 	return &game
 }
 
+// Draw is the main draw loop, called every frame
 func (game *Game) Draw(screen *ebiten.Image) {
 	// Draw background
 	game.background.Draw(gameView)
@@ -40,21 +43,22 @@ func (game *Game) Draw(screen *ebiten.Image) {
 	for obj := range GameObjects {
 		obj.Draw(gameView)
 	}
-	DrawGameView(screen)
+	drawGameView(screen)
 	game.debugger.Draw(screen)
 }
 
 var gameView = ebiten.NewImage(int(PlayfieldSize.X), int(PlayfieldSize.Y))
 
-func DrawGameView(screen *ebiten.Image) {
+func drawGameView(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
 	position := PlayfieldOffset
 
-	TranslateScaleAndRotateImage(&op.GeoM, position, Vector{X: 1, Y: 1}, 0)
+	translateScaleAndRotateImage(&op.GeoM, position, Vector{X: 1, Y: 1}, 0)
 
 	screen.DrawImage(gameView, op)
 }
 
+// Update is the main update loop, called every game tick
 func (game *Game) Update() error {
 	updateGameBackgroundSpeed(game)
 	game.background.Update()

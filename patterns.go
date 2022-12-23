@@ -44,6 +44,8 @@ var easings = map[string]func(float64) float64{
 	"bounce":      ease.InOutBounce,
 }
 
+// Pattern is a specific behavior an enemy can perform.
+// This can be a bullet pattern or a movement pattern, animations, etc.
 type Pattern struct {
 	Type     string
 	Options  map[string]any
@@ -51,6 +53,7 @@ type Pattern struct {
 	Cooldown time.Duration
 }
 
+// Option returns the value of a pattern option, or a default value if it isn't provided
 func (p *Pattern) Option(key string, defaultValue any) any {
 	if value, ok := p.Options[key]; ok {
 		return value
@@ -58,6 +61,7 @@ func (p *Pattern) Option(key string, defaultValue any) any {
 	return defaultValue
 }
 
+// Start starts the pattern
 func (p *Pattern) Start(entity *Entity) {
 	switch p.Type {
 	case "shoot_arc":
@@ -102,12 +106,14 @@ func (p *Pattern) moveToPattern(entity *Entity) {
 	}
 }
 
+// Schedule is a queue of patterns that will be played in order, looping back to the beginning when it reaches the end
 type Schedule struct {
 	index        int
 	lastPlayTime time.Time
 	Patterns     []Pattern
 }
 
+// Update updates the schedule, and should be called every game tick
 func (schedule *Schedule) Update(entity *Entity) {
 	lastPattern := schedule.Patterns[(schedule.index+len(schedule.Patterns)-1)%len(schedule.Patterns)]
 

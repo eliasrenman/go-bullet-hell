@@ -13,29 +13,36 @@ import (
 	"golang.org/x/image/font/opentype"
 )
 
+// Assets is the embedded assets directory
+//
 //go:embed assets
 var Assets embed.FS
 
+// Background is a tiling background image
 type Background struct {
 	Image    *Image
 	Velocity Vector
 	offset   Vector
 }
 
+// Update updates the background offset, moving it down depending on the player's current position
 func (background *Background) Update() {
 	offset := background.Velocity.ScaledBy((1. / 100) / 60)
 	background.offset.Add(offset)
 }
 
+// Draw draws the background image to the game screen
 func (background *Background) Draw(screen *ebiten.Image) {
 	background.Image.DrawTiled(screen, Vector{}, Vector{X: 2, Y: 2}, 0, background.offset)
 
 }
 
+// Font is a wrapper around the font.Face type
 type Font struct {
 	font.Face
 }
 
+// LoadFont loads a font from the assets directory
 func LoadFont(path string, op opentype.FaceOptions) *Font {
 	data, err := Assets.ReadFile("assets/" + path)
 	if err != nil {
@@ -68,23 +75,34 @@ func LoadFont(path string, op opentype.FaceOptions) *Font {
 }
 
 var (
-	OriginTop         = Vector{X: 0.5, Y: 0}
-	OriginTopLeft     = Vector{X: 0, Y: 0}
-	OriginTopRight    = Vector{X: 1, Y: 0}
-	OriginCenter      = Vector{X: 0.5, Y: 0.5}
-	OriginLeft        = Vector{X: 0, Y: 0.5}
-	OriginRight       = Vector{X: 1, Y: 0.5}
-	OriginBottom      = Vector{X: 0.5, Y: 1}
-	OriginBottomLeft  = Vector{X: 0, Y: 1}
+	// OriginTop represents the top of an image, using relative coordinates
+	OriginTop = Vector{X: 0.5, Y: 0}
+	// OriginTopLeft represents the top left of an image, using relative coordinates
+	OriginTopLeft = Vector{X: 0, Y: 0}
+	// OriginTopRight represents the top right of an image, using relative coordinates
+	OriginTopRight = Vector{X: 1, Y: 0}
+	// OriginCenter represents the center of an image, using relative coordinates
+	OriginCenter = Vector{X: 0.5, Y: 0.5}
+	// OriginLeft represents the center left of an image, using relative coordinates
+	OriginLeft = Vector{X: 0, Y: 0.5}
+	// OriginRight represents the center right of an image, using relative coordinates
+	OriginRight = Vector{X: 1, Y: 0.5}
+	// OriginBottom represents the bottom of an image, using relative coordinates
+	OriginBottom = Vector{X: 0.5, Y: 1}
+	// OriginBottomLeft represents the bottom left of an image, using relative coordinates
+	OriginBottomLeft = Vector{X: 0, Y: 1}
+	// OriginBottomRight represents the bottom right of an image, using relative coordinates
 	OriginBottomRight = Vector{X: 1, Y: 1}
 )
 
+// Image is a wrapper around the ebiten.Image type, with additional properties for drawing
 type Image struct {
 	*ebiten.Image
 	Size   Vector
 	Origin Vector
 }
 
+// LoadImage loads an image from the assets directory
 func LoadImage(path string, origin Vector) *Image {
 	data, err := Assets.Open("assets/" + path)
 	if err != nil {
@@ -109,21 +127,23 @@ func LoadImage(path string, origin Vector) *Image {
 	}
 }
 
-func TranslateScaleAndRotateImage(geom *ebiten.GeoM, position Vector, scale Vector, rotation float64) {
+func translateScaleAndRotateImage(geom *ebiten.GeoM, position Vector, scale Vector, rotation float64) {
 	geom.Translate(position.X, position.Y)
 	geom.Scale(float64(scale.X), float64(scale.Y))
 	geom.Rotate(rotation)
 }
 
+// Draw draws the image onto a target
 func (image *Image) Draw(target *ebiten.Image, position Vector, scale Vector, rotation float64) {
 	op := &ebiten.DrawImageOptions{}
 	position.Subtract(image.Origin.Dot(image.Size))
-	TranslateScaleAndRotateImage(&op.GeoM, position, scale, rotation)
+	translateScaleAndRotateImage(&op.GeoM, position, scale, rotation)
 	target.DrawImage(image.Image, op)
 }
 
 var tilingShader = LoadShader("shaders/tile.go")
 
+// DrawTiled draws the image onto a target using a tiling shader, offset represents the offset of the tiling, not the position of the image
 func (image *Image) DrawTiled(target *ebiten.Image, position Vector, scale Vector, rotation float64, offset Vector) {
 	images := []*Image{image}
 	uniforms := map[string]any{
@@ -132,10 +152,12 @@ func (image *Image) DrawTiled(target *ebiten.Image, position Vector, scale Vecto
 	tilingShader.Draw(target, position, scale, rotation, images, uniforms)
 }
 
+// Shader is a wrapper around the ebiten.Shader type
 type Shader struct {
 	*ebiten.Shader
 }
 
+// LoadShader loads a shader from the assets directory
 func LoadShader(path string) *Shader {
 	file, err := Assets.Open("assets/" + path)
 	if err != nil {
@@ -157,6 +179,7 @@ func LoadShader(path string) *Shader {
 	}
 }
 
+// Draw draws the shader onto a target
 func (shader *Shader) Draw(target *ebiten.Image, position Vector, scale Vector, rotation float64, images []*Image, uniforms map[string]any) {
 	op := &ebiten.DrawRectShaderOptions{}
 	width := target.Bounds().Dx()
@@ -169,7 +192,7 @@ func (shader *Shader) Draw(target *ebiten.Image, position Vector, scale Vector, 
 	}
 
 	op.Uniforms = map[string]any{
-		"Time":       float32(CurrentSeconds()),
+		"Time":       float32(TimeSinceStart().Seconds()),
 		"Resolution": []float32{float32(width), float32(height)},
 	}
 
@@ -181,6 +204,6 @@ func (shader *Shader) Draw(target *ebiten.Image, position Vector, scale Vector, 
 		op.Uniforms[key] = value
 	}
 
-	TranslateScaleAndRotateImage(&op.GeoM, position, scale, rotation)
+	translateScaleAndRotateImage(&op.GeoM, position, scale, rotation)
 	target.DrawRectShader(width, height, shader.Shader, op)
 }

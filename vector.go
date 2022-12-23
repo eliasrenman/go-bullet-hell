@@ -2,19 +2,26 @@ package main
 
 import "math"
 
+// Vector represents a 2D vector
 type Vector struct {
 	X float64
 	Y float64
 }
 
 var (
-	Zero  = Vector{X: 0, Y: 0}
-	Up    = Vector{X: 0, Y: -1}
-	Down  = Vector{X: 0, Y: 1}
-	Left  = Vector{X: -1, Y: 0}
+	// Zero is a vector with both components set to 0
+	Zero = Vector{X: 0, Y: 0}
+	// Up is a vector pointing up
+	Up = Vector{X: 0, Y: -1}
+	// Down is a vector pointing down
+	Down = Vector{X: 0, Y: 1}
+	// Left is a vector pointing left
+	Left = Vector{X: -1, Y: 0}
+	// Right is a vector pointing right
 	Right = Vector{X: 1, Y: 0}
 )
 
+// VectorFromAngle creates a vector given an angle in radians
 func VectorFromAngle(angle float64) Vector {
 	return Vector{
 		X: math.Cos(angle),
@@ -22,113 +29,124 @@ func VectorFromAngle(angle float64) Vector {
 	}
 }
 
-// Calculates the magnitude (length) of the vector
-func (vec Vector) Magnitude() float64 {
-	return math.Sqrt(vec.X*vec.X + vec.Y*vec.Y)
+// Magnitude calculates the magnitude (length) of the vector
+func (vector Vector) Magnitude() float64 {
+	return math.Sqrt(vector.X*vector.X + vector.Y*vector.Y)
 }
 
-// Calculates the direction of the vector
-func (vec *Vector) Direction() float64 {
-	return math.Tan(vec.Y / vec.X)
+// Direction calculates the direction of the vector
+func (vector *Vector) Direction() float64 {
+	return math.Tan(vector.Y / vector.X)
 }
 
-// Normalizes the vector, setting its magnitude to 1
-func (vec *Vector) Normalize() {
-	magnitude := vec.Magnitude()
+// Normalize normalizes the vector, setting its magnitude to 1
+func (vector *Vector) Normalize() {
+	magnitude := vector.Magnitude()
 
 	if magnitude == 0 {
 		return // Avoid divide-by-zero overflow
 	}
 
-	vec.X /= magnitude
-	vec.Y /= magnitude
+	vector.X /= magnitude
+	vector.Y /= magnitude
 }
 
-// Creates a normalized copy of the vector
-func (vec Vector) Normalized() Vector {
-	v := vec.Copy()
+// Normalized creates a normalized copy of the vector
+func (vector Vector) Normalized() Vector {
+	v := vector.Copy()
 	v.Normalize()
 
 	return v
 }
 
-func (vec Vector) Angle() float64 {
-	return math.Atan2(vec.Y, vec.X)
+// Angle returns the angle of the vector in radians
+func (vector Vector) Angle() float64 {
+	return math.Atan2(vector.Y, vector.X)
 }
 
-// Creates a copy of the vector
-func (vec Vector) Copy() Vector {
-	v := Vector{vec.X, vec.Y}
+// Copy creates a copy of the vector
+func (vector Vector) Copy() Vector {
+	v := Vector{vector.X, vector.Y}
 	return v
 }
 
-// Calculates the distance between two vectors
-func (a Vector) Distance(b Vector) float64 {
-	return a.Minus(b).Magnitude()
+// Distance calculates the distance between two vectors
+func (vector Vector) Distance(other Vector) float64 {
+	return vector.Minus(other).Magnitude()
 }
 
 // Pointer arithmetic
 // modifies the original variable
 
-func (a *Vector) Add(b Vector) *Vector {
-	a.X += b.X
-	a.Y += b.Y
-	return a
+// Add adds another vector to the vector
+func (vector *Vector) Add(other Vector) *Vector {
+	vector.X += other.X
+	vector.Y += other.Y
+	return vector
 }
 
-func (a *Vector) Subtract(b Vector) *Vector {
-	a.X -= b.X
-	a.Y -= b.Y
-	return a
+// Subtract subtracts another vector from the vector
+func (vector *Vector) Subtract(other Vector) *Vector {
+	vector.X -= other.X
+	vector.Y -= other.Y
+	return vector
 }
 
-func (a *Vector) Multiply(b Vector) *Vector {
-	a.X *= b.X
-	a.Y *= b.Y
-	return a
+// Multiply multiplies the vector by another vector
+func (vector *Vector) Multiply(other Vector) *Vector {
+	vector.X *= other.X
+	vector.Y *= other.Y
+	return vector
 }
 
-func (a *Vector) Divide(b Vector) *Vector {
-	a.X /= b.X
-	a.Y /= b.Y
-	return a
+// Divide divides the vector by another vector
+func (vector *Vector) Divide(other Vector) *Vector {
+	vector.X /= other.X
+	vector.Y /= other.Y
+	return vector
 }
 
-func (a *Vector) Scale(b float64) *Vector {
-	a.X *= b
-	a.Y *= b
-	return a
+// Scale scales the vector by a scalar value
+func (vector *Vector) Scale(value float64) *Vector {
+	vector.X *= value
+	vector.Y *= value
+	return vector
 }
 
 // Value arithmetic
 // creates a new variable
 
-func (a Vector) Plus(b Vector) Vector {
-	v := a.Copy()
-	v.Add(b)
+// Plus creates a new vector representing the sum of two vectors
+func (vector Vector) Plus(other Vector) Vector {
+	v := vector.Copy()
+	v.Add(other)
 	return v
 }
 
-func (a Vector) Minus(b Vector) Vector {
-	v := a.Copy()
-	v.Subtract(b)
+// Minus creates a new vector representing the difference between two vectors
+func (vector Vector) Minus(other Vector) Vector {
+	v := vector.Copy()
+	v.Subtract(other)
 	return v
 }
 
-func (a Vector) Dot(b Vector) Vector {
-	v := a.Copy()
-	v.Multiply(b)
+// Dot creates a new vector representing the dot product of two vectors
+func (vector Vector) Dot(other Vector) Vector {
+	v := vector.Copy()
+	v.Multiply(other)
 	return v
 }
 
-func (a Vector) DividedBy(b Vector) Vector {
-	v := a.Copy()
-	v.Divide(b)
+// DividedBy creates a new vector representing the quotient between two vectors
+func (vector Vector) DividedBy(other Vector) Vector {
+	v := vector.Copy()
+	v.Divide(other)
 	return v
 }
 
-func (a Vector) ScaledBy(b float64) Vector {
-	v := a.Copy()
-	v.Scale(b)
+// ScaledBy creates a new vector representing the product of a vector and a scalar
+func (vector Vector) ScaledBy(value float64) Vector {
+	v := vector.Copy()
+	v.Scale(value)
 	return v
 }

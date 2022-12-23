@@ -11,6 +11,7 @@ import (
 	"golang.org/x/image/font/opentype"
 )
 
+// Debugger is a debug overlay that displays information about the game
 type Debugger struct {
 	Visible         bool
 	Game            *Game
@@ -23,6 +24,7 @@ type Debugger struct {
 	cursorPosition  Vector
 }
 
+// NewDebugger creates a new debugger given a game instance
 func NewDebugger(game *Game) *Debugger {
 
 	return &Debugger{
@@ -35,6 +37,7 @@ func NewDebugger(game *Game) *Debugger {
 	}
 }
 
+// Update updates the debugger information
 func (debugger *Debugger) Update() error {
 	// Toggle debug mode
 	if ButtonDebug.GetPressed(0) {
@@ -65,16 +68,19 @@ func (debugger *Debugger) Update() error {
 
 var crosshairImage = LoadImage("crosshair.png", OriginCenter)
 
+// Start is called when the debugger is enabled
 func (debugger *Debugger) Start() {
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	fmt.Println("Debug mode enabled")
 }
 
+// Stop is called when the debugger is disabled
 func (debugger *Debugger) Stop() {
 	ebiten.SetCursorMode(ebiten.CursorModeVisible)
 	fmt.Println("Debug mode disabled")
 }
 
+// Draw draws the debugger onto the screen
 func (debugger *Debugger) Draw(screen *ebiten.Image) {
 	if !debugger.Visible {
 		return

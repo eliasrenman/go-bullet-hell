@@ -6,18 +6,21 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-// An Entity is an object in space
+// Entity is an object in space,
 // it has a position and a velocity
 type Entity struct {
 	Position Vector
 	Velocity Vector
 }
 
+// Move moves the entity by a given vector relative to its position
 func (entity *Entity) Move(vector Vector) {
 	entity.Position.X += vector.X
 	entity.Position.Y += vector.Y
 }
 
+// GameObject is an interface for all game objects.
+// Game objects are spawned using the Spawn function, which will call the Start method.
 type GameObject interface {
 	Start()
 	Update()
@@ -25,16 +28,14 @@ type GameObject interface {
 	Draw(image *ebiten.Image)
 }
 
-// Workaround for Set types
-// empty structs consume 0 bytes of memory, so a mapping between T->struct{}
-// is equivalent to what most other languages would call a "Set"
+// GameObjects is a set of all game objects
 var GameObjects = make(map[GameObject]struct{})
 var mu sync.Mutex
 
 // The spawn queue is used to spawn new game objects in the next frame, to avoid concurrent map writes
 var spawnQueue = make(map[GameObject]struct{})
 
-// Spawn a new copy of a game object
+// Spawn creates a new copy of a game object
 func Spawn[T GameObject](obj T) T {
 	mu.Lock()
 	spawnQueue[obj] = struct{}{}
@@ -44,7 +45,8 @@ func Spawn[T GameObject](obj T) T {
 	return obj
 }
 
-// Spawn all game objects in the spawn queue, and clear the queue
+// SpawnGameObjects spawns all game objects in the spawn queue, and clears the queue.
+// This function is called at the end of each frame to avoid concurrent map writes.
 func SpawnGameObjects() {
 	mu.Lock()
 	for obj := range spawnQueue {
@@ -60,7 +62,7 @@ func Destroy(obj GameObject) {
 	delete(GameObjects, obj)
 }
 
-// Bullets are Entities with additional values for Damage, Size, Speed and Direction
+// Bullet is an Entity with additional values for Damage, Size, Speed and Direction
 type Bullet struct {
 	Entity
 	Owner  *Entity
@@ -72,26 +74,30 @@ type Bullet struct {
 	Direction float64
 }
 
+// SetAngularVelocity sets the velocity of the bullet given a speed and a direction
 func (b *Bullet) SetAngularVelocity(speed float64, direction float64) {
 	b.Speed = speed
 	b.Direction = direction
 	b.Velocity = VectorFromAngle(direction).ScaledBy(speed)
 }
 
-func (owner *Entity) Shoot(position Vector, direction float64, speed float64, offset float64) {
+// Shoot spawns a bullet at a given position, with a given speed and direction
+func (entity *Entity) Shoot(position Vector, direction float64, speed float64, offset float64) {
 
 	// This offests the inital position based on the direction of the bullet.
 	position.Add(VectorFromAngle(direction).ScaledBy(offset))
 
 	bullet := Spawn(&Bullet{
 		Entity: Entity{Position: position},
-		Owner:  owner,
+		Owner:  entity,
 	})
 	bullet.SetAngularVelocity(speed, direction)
 }
 
+// Start is called when the bullet is spawned
 func (b *Bullet) Start() {}
 
+// Update is called every game tick. 60 times per second
 func (b *Bullet) Update() {
 	b.Move(b.Velocity)
 	if b.Position.Y < 0 || b.Position.Y > ScreenSize.Y {
@@ -101,9 +107,11 @@ func (b *Bullet) Update() {
 
 var bulletImage = LoadImage("bullets/bullet.png", OriginCenter)
 
+// Draw is called every frame to draw the bullet
 func (b *Bullet) Draw(screen *ebiten.Image) {
 	bulletImage.Draw(screen, b.Position, Vector{X: 1, Y: 1}, 0)
 }
 
+// Die is called when the bullet is destroyed
 func (b *Bullet) Die() {
 }
