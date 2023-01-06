@@ -1,8 +1,6 @@
 package main
 
 import (
-	"time"
-
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -14,12 +12,15 @@ type Player struct {
 	*Entity
 	*Health
 	// Bullets shot per second
-	ShootSpeed    float64
-	CanShoot      bool
-	lastShootTime time.Time
+	ShootSpeedThrottler Throttler
+	CanShoot            bool
 
-	MoveHitbox   Collidable
-	DamageHitbox Collidable
+	MoveHitbox          *RectangleHitbox
+	DamageHitbox        *CircleHitbox
+	showHitbox          bool
+	hit                 bool
+	hitCleanupCounter   int
+	hitCleanupThrottler Throttler
 }
 
 // NewPlayer creates a new player instance
@@ -32,8 +33,13 @@ func NewPlayer(position Vector) *Player {
 			MaxHitPoints: 5,
 			HitPoints:    5,
 		},
-		ShootSpeed: 10,
-		CanShoot:   true,
+		ShootSpeedThrottler: Throttler{
+			RatePerSecond: 10,
+		},
+		CanShoot: true,
+		hitCleanupThrottler: Throttler{
+			RatePerSecond: 30,
+		},
 	}
 
 	player.MoveHitbox = &RectangleHitbox{
@@ -44,10 +50,10 @@ func NewPlayer(position Vector) *Player {
 		},
 	}
 
-	player.DamageHitbox = &RectangleHitbox{
-		Size: Vector{X: 16, Y: 16},
+	player.DamageHitbox = &CircleHitbox{
+		Radius: 4,
 		Hitbox: Hitbox{
-			Position: Vector{},
+			Position: Vector{X: -4, Y: -4},
 			Owner:    player.Entity,
 		},
 	}
@@ -66,7 +72,7 @@ var gameFieldHitbox = &RectangleHitbox{
 }
 
 // Update is called every game tick, and handles player behavior
-func (player *Player) Update() {
+func (player *Player) Update(game *Game) {
 	// Handle movement
 	moveInput := Vector{
 		X: AxisHorizontal.Get(0),
@@ -74,13 +80,16 @@ func (player *Player) Update() {
 	}
 	direction := moveInput.Angle()
 	speed := 0.
+	moveSlow := ButtonSlow.Get(0)
 	if moveInput.X != 0 || moveInput.Y != 0 {
-		if ButtonSlow.Get(0) {
+		if moveSlow {
+
 			speed = moveSpeedSlow
 		} else {
 			speed = moveSpeed
 		}
 	}
+	player.showHitbox = moveSlow
 
 	// Allow sliding against walls
 	for i := 0.; i < 60 && i > -60; i = -(i + Sign(i)) {
@@ -91,10 +100,10 @@ func (player *Player) Update() {
 			break
 		}
 	}
-
+	player.checkBulletCollision()
 	// Handle shooting
 	if player.CanShoot && ButtonShoot.Get(0) {
-		if time.Since(player.lastShootTime) > time.Second/time.Duration(player.ShootSpeed) {
+		if player.ShootSpeedThrottler.CanCall() {
 			player.Shoot(
 				player.Position.Copy().Minus(Vector{X: 0, Y: 0}),
 				DegToRad(-90),
@@ -103,7 +112,46 @@ func (player *Player) Update() {
 				0,
 			)
 
-			player.lastShootTime = time.Now()
+			player.ShootSpeedThrottler.Call()
+		}
+	}
+
+	if player.hit && player.hitCleanupThrottler.CanCall() {
+		if player.hitCleanupCounter > 23 {
+			player.hit = false
+			player.hitCleanupCounter = 0
+		} else {
+			player.hitCleanupCounter++
+		}
+		player.hitCleanupThrottler.Call()
+	}
+}
+
+func (player *Player) checkBulletCollision() {
+	bulletsInMoveHitbox := make(map[*Bullet]struct{})
+	cleanupHitbox := &CircleHitbox{
+		Radius: float64(player.hitCleanupCounter),
+	}
+	for b := range BulletObjects {
+		bullet, ok := b.(*Bullet)
+
+		if ok && *bullet.Owner != *player.Entity {
+
+			if CollidesAt(cleanupHitbox, player.Position, bullet.Hitbox, bullet.Position) {
+				bulletsInMoveHitbox[bullet] = struct{}{}
+			}
+			if CollidesAt(player.DamageHitbox, player.Position, bullet.Hitbox, bullet.Position) {
+				player.hit = true
+				player.hitCleanupCounter = 0
+
+				Destroy(bullet)
+			}
+		}
+	}
+	if player.hit {
+		for b := range bulletsInMoveHitbox {
+
+			Destroy(b)
 		}
 	}
 }
@@ -113,7 +161,7 @@ func (player *Player) Die() {
 	// Make sure to clean up all the players bullets
 	for obj := range BulletObjects {
 		bullet, ok := obj.(*Bullet)
-		if ok && bullet.Entity == *player.Entity {
+		if ok && *bullet.Entity == *player.Entity {
 			Destroy(bullet)
 		}
 	}
@@ -123,6 +171,7 @@ var (
 	playerImage      = LoadImage("characters/player_forward.png", OriginCenter)
 	playerLeftImage  = LoadImage("characters/player_left.png", OriginCenter)
 	playerRightImage = LoadImage("characters/player_right.png", OriginCenter)
+	playerHitbox     = LoadImage("characters/player_hitbox.png", OriginCenter)
 )
 
 // Draw is called every frame to draw the player
@@ -137,4 +186,12 @@ func (player *Player) Draw(screen *ebiten.Image) {
 	}
 
 	image.Draw(screen, player.Position, Vector{X: 1, Y: 1}, 0)
+	if player.showHitbox {
+		playerHitbox.Draw(screen, player.Position, Vector{X: 1, Y: 1}, 0)
+
+	}
+	if HitboxesVisible {
+		player.MoveHitbox.Draw(screen, player.Position)
+		player.DamageHitbox.Draw(screen, player.Position)
+	}
 }

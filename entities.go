@@ -23,7 +23,7 @@ func (entity *Entity) Move(vector Vector) {
 // Game objects are spawned using the Spawn function, which will call the Start method.
 type GameObject interface {
 	Start()
-	Update()
+	Update(game *Game)
 	Die()
 	Draw(image *ebiten.Image)
 }
@@ -95,7 +95,8 @@ func Destroy(obj GameObject) {
 
 // Bullet is an Entity with additional values for Damage, Size, Speed and Direction
 type Bullet struct {
-	Entity
+	*Entity
+	Hitbox Collidable
 	Owner  *Entity
 	Damage int
 
@@ -118,20 +119,31 @@ func (entity *Entity) Shoot(position Vector, direction float64, speed float64, o
 
 	// This offests the inital position based on the direction of the bullet.
 	position.Add(VectorFromAngle(direction).ScaledBy(offset))
-
+	e := &Entity{Position: position}
 	bullet := Spawn(&Bullet{
-		Entity:     Entity{Position: position},
+		Entity:     e,
 		Owner:      entity,
 		BulletType: bulletType,
+		//Collidable:     getBulletHitbox(bulletType),
 	}, BulletQueue)
+	bullet.Hitbox = getBulletHitbox(bulletType, bullet)
 	bullet.SetAngularVelocity(speed, direction)
+}
+
+func getBulletHitbox(bulletType int, owner *Bullet) *CircleHitbox {
+	switch bulletType {
+	case BulletSmallYellow:
+		return &CircleHitbox{Radius: 4, Hitbox: Hitbox{Position: Vector{X: -4, Y: -4}, Owner: owner.Entity}}
+	default:
+		return &CircleHitbox{Radius: 4, Hitbox: Hitbox{Position: Vector{X: -4, Y: -4}, Owner: owner.Entity}}
+	}
 }
 
 // Start is called when the bullet is spawned
 func (b *Bullet) Start() {}
 
 // Update is called every game tick. 60 times per second
-func (b *Bullet) Update() {
+func (b *Bullet) Update(game *Game) {
 	b.Move(b.Velocity)
 	if b.Position.Y < 0 || b.Position.Y > ScreenSize.Y {
 		Destroy(b)
@@ -157,6 +169,9 @@ func (b *Bullet) Draw(screen *ebiten.Image) {
 	}
 
 	bImage.Draw(screen, b.Position, Vector{X: 1, Y: 1}, 0)
+	if HitboxesVisible {
+		b.Hitbox.Draw(screen, b.Position)
+	}
 }
 
 // Die is called when the bullet is destroyed

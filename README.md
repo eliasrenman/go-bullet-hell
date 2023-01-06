@@ -19,4 +19,5 @@ Here is a list of the modules needed for my game
 * Game event handling, in progress
 * Game logic
 * Hitboxes and colision
+ - Player colision added but something seems off with the hitzones
 * Add Asteroids

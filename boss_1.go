@@ -38,6 +38,9 @@ type BossOne struct {
 
 func (boss *BossOne) Draw(screen *ebiten.Image) {
 	bossOneImage.Draw(screen, boss.Position, Vector{X: 1, Y: 1}, 0)
+	if HitboxesVisible {
+		boss.Hitbox.Draw(screen, boss.Position)
+	}
 }
 
 var schedule = Schedule{
@@ -111,8 +114,27 @@ var schedule = Schedule{
 func (boss *BossOne) Start() {
 }
 
-func (boss *BossOne) Update() {
+func (boss *BossOne) Update(game *Game) {
 	schedule.Update(boss.Entity)
+	boss.checkBulletCollision(game.player)
+}
+
+func (boss *BossOne) checkBulletCollision(player *Player) {
+
+	for b := range BulletObjects {
+		bullet, ok := b.(*Bullet)
+
+		// This should have to make sure that the bullet is owned by the player. otherwise this could result in friendly fire from other enemies
+		if ok && *bullet.Owner == *player.Entity {
+
+			if CollidesAt(boss.Hitbox, boss.Position, bullet.Hitbox, bullet.Position) {
+
+				Destroy(bullet)
+				// Lower the hp of the boss by the value of the bullet's damage
+			}
+		}
+	}
+
 }
 
 func (boss *BossOne) Die() {
