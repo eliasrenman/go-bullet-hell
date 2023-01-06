@@ -20,6 +20,7 @@ type Player struct {
 
 	MoveHitbox   Collidable
 	DamageHitbox Collidable
+	showHitbox   bool
 }
 
 // NewPlayer creates a new player instance
@@ -41,7 +42,7 @@ func NewPlayer(position Vector) *Player {
 	}
 
 	player.DamageHitbox = &RectangleHitbox{
-		Size: Vector{X: 16, Y: 16},
+		Size: Vector{X: 8, Y: 8},
 		Hitbox: Hitbox{
 			Position: Vector{},
 			Owner:    player.Entity,
@@ -70,13 +71,16 @@ func (player *Player) Update() {
 	}
 	direction := moveInput.Angle()
 	speed := 0.
+	moveSlow := ButtonSlow.Get(0)
 	if moveInput.X != 0 || moveInput.Y != 0 {
-		if ButtonSlow.Get(0) {
+		if moveSlow {
+
 			speed = moveSpeedSlow
 		} else {
 			speed = moveSpeed
 		}
 	}
+	player.showHitbox = moveSlow
 
 	// Allow sliding against walls
 	for i := 0.; i < 60 && i > -60; i = -(i + Sign(i)) {
@@ -119,6 +123,7 @@ var (
 	playerImage      = LoadImage("characters/player_forward.png", OriginCenter)
 	playerLeftImage  = LoadImage("characters/player_left.png", OriginCenter)
 	playerRightImage = LoadImage("characters/player_right.png", OriginCenter)
+	playerHitbox     = LoadImage("characters/player_hitbox.png", OriginCenter)
 )
 
 // Draw is called every frame to draw the player
@@ -133,4 +138,7 @@ func (player *Player) Draw(screen *ebiten.Image) {
 	}
 
 	image.Draw(screen, player.Position, Vector{X: 1, Y: 1}, 0)
+	if player.showHitbox {
+		playerHitbox.Draw(screen, player.Position, Vector{X: 1, Y: 1}, 0)
+	}
 }
