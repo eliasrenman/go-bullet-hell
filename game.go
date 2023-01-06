@@ -17,9 +17,10 @@ var backgroundImage = LoadImage("bg/img1.png", OriginTopLeft)
 func NewGame() *Game {
 	player := Spawn(NewPlayer(PlayerStart), CharacterQueue)
 
+	SpawnHealthBar(NewGuiHealthBar(player.Health, PlayfieldSize.X+100, 250, "Player"))
 	// Spawn boss
-	Spawn(NewBossOne(PlayfieldSize.Dot(OriginTop).Plus(Vector{Y: 100})), CharacterQueue)
-
+	bossOne := Spawn(NewBossOne(PlayfieldSize.Dot(OriginTop).Plus(Vector{Y: 100})), CharacterQueue)
+	SpawnHealthBar(NewGuiHealthBar(bossOne.Health, PlayfieldSize.X+100, 265, "Boss 1"))
 	game := Game{
 		player: player,
 		background: Background{
@@ -49,6 +50,10 @@ func (game *Game) Draw(screen *ebiten.Image) {
 
 	for obj := range BulletObjects {
 		obj.Draw(gameView)
+	}
+
+	for obj := range GuiElements {
+		obj.Draw(screen)
 	}
 	drawGameView(screen)
 	game.debugger.Draw(screen)
@@ -80,6 +85,9 @@ func (game *Game) Update() error {
 		obj.Update(game)
 	}
 
+	for obj := range GuiElements {
+		obj.Update()
+	}
 	SpawnObjects()
 	return nil
 }
