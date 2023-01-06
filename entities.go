@@ -38,15 +38,18 @@ var CharacterObjects = make(map[GameObject]struct{})
 var BulletObjects = make(map[GameObject]struct{})
 var mu sync.Mutex
 
-// The spawn queue is used to spawn new game objects in the next frame, to avoid concurrent map writes
+// The spawn queue is used to spawn new background objects in the next frame, to avoid concurrent map writes
+var backgroundSpawnQueue = make(map[GameObject]struct{})
+
+// The spawn queue is used to spawn new character objects in the next frame, to avoid concurrent map writes
 var characterSpawnQueue = make(map[GameObject]struct{})
 
-// The spawn queue is used to spawn new game objects in the next frame, to avoid concurrent map writes
+// The spawn queue is used to spawn new bullet objects in the next frame, to avoid concurrent map writes
 var bulletSpawnQueue = make(map[GameObject]struct{})
 
 const (
 	CharacterQueue string = "character"
-	BulletQueue           = "bullet"
+	BulletQueue    string = "bullet"
 )
 
 // Spawn creates a new copy of a game object
@@ -77,6 +80,10 @@ func SpawnObjects() {
 		CharacterObjects[obj] = struct{}{}
 	}
 	characterSpawnQueue = make(map[GameObject]struct{})
+	for obj := range backgroundSpawnQueue {
+		CharacterObjects[obj] = struct{}{}
+	}
+	backgroundSpawnQueue = make(map[GameObject]struct{})
 	mu.Unlock()
 }
 
