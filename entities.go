@@ -115,7 +115,7 @@ func (b *Bullet) SetAngularVelocity(speed float64, direction float64) {
 }
 
 // Shoot spawns a bullet at a given position, with a given speed and direction
-func (entity *Entity) Shoot(position Vector, direction float64, speed float64, offset float64, bulletType int) {
+func (entity *Entity) Shoot(position Vector, direction float64, speed float64, offset float64, bulletType int, damage int) {
 
 	// This offests the inital position based on the direction of the bullet.
 	position.Add(VectorFromAngle(direction).ScaledBy(offset))
@@ -124,6 +124,7 @@ func (entity *Entity) Shoot(position Vector, direction float64, speed float64, o
 		Entity:     e,
 		Owner:      entity,
 		BulletType: bulletType,
+		Damage:     damage,
 		//Collidable:     getBulletHitbox(bulletType),
 	}, BulletQueue)
 	bullet.Hitbox = getBulletHitbox(bulletType, bullet)

@@ -128,9 +128,10 @@ func (boss *BossOne) checkBulletCollision(player *Player) {
 		if ok && *bullet.Owner == *player.Entity {
 
 			if CollidesAt(boss.Hitbox, boss.Position, bullet.Hitbox, bullet.Position) {
-
-				Destroy(bullet)
+				boss.Health.TakeDamage(bullet)
 				// Lower the hp of the boss by the value of the bullet's damage
+				Destroy(bullet)
+
 			}
 		}
 	}

@@ -110,6 +110,7 @@ func (player *Player) Update(game *Game) {
 				6,
 				25,
 				0,
+				2,
 			)
 
 			player.ShootSpeedThrottler.Call()
@@ -140,10 +141,11 @@ func (player *Player) checkBulletCollision() {
 			if CollidesAt(cleanupHitbox, player.Position, bullet.Hitbox, bullet.Position) {
 				bulletsInMoveHitbox[bullet] = struct{}{}
 			}
-			if CollidesAt(player.DamageHitbox, player.Position, bullet.Hitbox, bullet.Position) {
+			if !player.hit && CollidesAt(player.DamageHitbox, player.Position, bullet.Hitbox, bullet.Position) {
 				player.hit = true
 				player.hitCleanupCounter = 0
 
+				player.Health.TakeDamage(bullet)
 				Destroy(bullet)
 			}
 		}

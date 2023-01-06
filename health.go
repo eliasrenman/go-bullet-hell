@@ -5,7 +5,7 @@ type Health struct {
 	HitPoints    int
 }
 
-func (health *Health) Update(bullet *Bullet) {
+func (health *Health) TakeDamage(bullet *Bullet) {
 	health.HitPoints -= bullet.Damage
 	if health.HitPoints < 0 {
 		health.HitPoints = 0

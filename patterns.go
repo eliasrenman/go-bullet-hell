@@ -81,7 +81,7 @@ func (p *Pattern) shootArcPattern(entity *Entity) {
 
 	for i := 0; i < count; i++ {
 		angle := from + (to-from)/float64(count)*float64(i)
-		entity.Shoot(entity.Position, angle, speed, 0, p.BulletType)
+		entity.Shoot(entity.Position, angle, speed, 0, p.BulletType, 1)
 		time.Sleep(time.Duration(stagger * float64(time.Second.Nanoseconds())))
 	}
 }
