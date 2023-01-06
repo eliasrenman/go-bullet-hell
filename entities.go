@@ -23,7 +23,7 @@ func (entity *Entity) Move(vector Vector) {
 // Game objects are spawned using the Spawn function, which will call the Start method.
 type GameObject interface {
 	Start()
-	Update()
+	Update(game *Game)
 	Die()
 	Draw(image *ebiten.Image)
 }
@@ -143,7 +143,7 @@ func getBulletHitbox(bulletType int, owner *Bullet) *CircleHitbox {
 func (b *Bullet) Start() {}
 
 // Update is called every game tick. 60 times per second
-func (b *Bullet) Update() {
+func (b *Bullet) Update(game *Game) {
 	b.Move(b.Velocity)
 	if b.Position.Y < 0 || b.Position.Y > ScreenSize.Y {
 		Destroy(b)

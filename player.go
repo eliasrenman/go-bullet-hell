@@ -68,7 +68,7 @@ var gameFieldHitbox = &RectangleHitbox{
 }
 
 // Update is called every game tick, and handles player behavior
-func (player *Player) Update() {
+func (player *Player) Update(game *Game) {
 	// Handle movement
 	moveInput := Vector{
 		X: AxisHorizontal.Get(0),

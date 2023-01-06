@@ -71,13 +71,13 @@ func (game *Game) Update() error {
 	game.debugger.Update()
 
 	for obj := range BackgroundObjects {
-		obj.Update()
+		obj.Update(game)
 	}
 	for obj := range BulletObjects {
-		obj.Update()
+		obj.Update(game)
 	}
 	for obj := range CharacterObjects {
-		obj.Update()
+		obj.Update(game)
 	}
 
 	SpawnObjects()

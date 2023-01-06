@@ -109,18 +109,18 @@ var schedule = Schedule{
 func (boss *BossOne) Start() {
 }
 
-func (boss *BossOne) Update() {
+func (boss *BossOne) Update(game *Game) {
 	schedule.Update(boss.Entity)
-	boss.checkBulletCollision()
+	boss.checkBulletCollision(game.player)
 }
 
-func (boss *BossOne) checkBulletCollision() {
+func (boss *BossOne) checkBulletCollision(player *Player) {
 
 	for b := range BulletObjects {
 		bullet, ok := b.(*Bullet)
 
 		// This should have to make sure that the bullet is owned by the player. otherwise this could result in friendly fire from other enemies
-		if ok && *bullet.Owner != *boss.Entity {
+		if ok && *bullet.Owner == *player.Entity {
 
 			if CollidesAt(boss.Hitbox, boss.Position, bullet.Hitbox, bullet.Position) {
 
