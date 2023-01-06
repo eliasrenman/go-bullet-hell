@@ -33,6 +33,9 @@ type BossOne struct {
 
 func (boss *BossOne) Draw(screen *ebiten.Image) {
 	bossOneImage.Draw(screen, boss.Position, Vector{X: 1, Y: 1}, 0)
+	if HitboxesVisible {
+		boss.Hitbox.Draw(screen, boss.Position)
+	}
 }
 
 var schedule = Schedule{
