@@ -15,6 +15,10 @@ func NewBossOne(position Vector) *BossOne {
 	}
 	boss := &BossOne{
 		Entity: e,
+		Health: &Health{
+			MaxHitPoints: 100,
+			HitPoints:    100,
+		},
 		Hitbox: &RectangleHitbox{
 			Size: Vector{X: 32, Y: 32},
 			Hitbox: Hitbox{
@@ -28,6 +32,7 @@ func NewBossOne(position Vector) *BossOne {
 
 type BossOne struct {
 	*Entity
+	*Health
 	Hitbox *RectangleHitbox
 }
 

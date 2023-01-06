@@ -12,7 +12,7 @@ const moveSpeedSlow float64 = 2
 // Player is the player character
 type Player struct {
 	*Entity
-
+	*Health
 	// Bullets shot per second
 	ShootSpeed    float64
 	CanShoot      bool
@@ -27,6 +27,10 @@ func NewPlayer(position Vector) *Player {
 	player := &Player{
 		Entity: &Entity{
 			Position: position,
+		},
+		Health: &Health{
+			MaxHitPoints: 5,
+			HitPoints:    5,
 		},
 		ShootSpeed: 10,
 		CanShoot:   true,
