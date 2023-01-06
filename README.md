@@ -9,15 +9,19 @@ Here is a list of the modules needed for my game
 
 * Button input
  - Keyboard completed
- - Gamepad completed, in need of a cleanup
+ - Gamepad completed, Currently disabled in need of a rewrite
 * Animating
   - Player animations are done.
   - Enemy animations are done.
 * Ai
  - Bullet patterns
- - Movesets
-* Game event handling, in progress
-* Game logic
+   1. Arc patterns (Completed)
+   2. Aimed patters
+ - Move Scheduler (Completed)
+* Game event scheduler
 * Hitboxes and colision
  - Player colision added but something seems off with the hitzones
+ - Enemy collision (completed)
 * Add Asteroids
+* Add game assets with multiple bosses and enemies etc.
+* Scoreboard.
