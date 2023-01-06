@@ -60,7 +60,6 @@ func drawGameView(screen *ebiten.Image) {
 
 // Update is the main update loop, called every game tick
 func (game *Game) Update() error {
-	updateGameBackgroundSpeed(game)
 	game.background.Update()
 	game.debugger.Update()
 
@@ -70,13 +69,4 @@ func (game *Game) Update() error {
 
 	SpawnGameObjects()
 	return nil
-}
-
-func updateGameBackgroundSpeed(game *Game) {
-	if game.player.Velocity.Y != 0 {
-		offsetVelocity := game.player.Velocity.Y*-0.5 + PlayerSpeed/2
-		game.background.Velocity = Up.ScaledBy(offsetVelocity + 1)
-	} else {
-		game.background.Velocity = Up.ScaledBy(BackgroundSpeed)
-	}
 }
