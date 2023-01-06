@@ -50,8 +50,9 @@ var schedule = Schedule{
 				"from":  0.25 * math.Pi,
 				"to":    .75 * math.Pi,
 			},
-			Duration: 1 * time.Second,
-			Cooldown: 1 * time.Second,
+			Duration:   1 * time.Second,
+			Cooldown:   1 * time.Second,
+			BulletType: BulletSmallYellow,
 		},
 		{
 			Type: "move_to",
@@ -71,6 +72,7 @@ var schedule = Schedule{
 				"to":      2 * math.Pi,
 				"stagger": 1.0 / 30,
 			},
+			BulletType: BulletSmallYellow,
 		},
 		{
 			Type: "move_to",
@@ -90,8 +92,9 @@ var schedule = Schedule{
 				"to":      3 * math.Pi,
 				"stagger": 1.0 / 30,
 			},
-			Duration: 2 * time.Second,
-			Cooldown: 1 * time.Second,
+			Duration:   2 * time.Second,
+			Cooldown:   1 * time.Second,
+			BulletType: BulletSmallYellow,
 		},
 		{
 			Type: "move_to",
