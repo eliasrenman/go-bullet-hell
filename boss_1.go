@@ -111,6 +111,25 @@ func (boss *BossOne) Start() {
 
 func (boss *BossOne) Update() {
 	schedule.Update(boss.Entity)
+	boss.checkBulletCollision()
+}
+
+func (boss *BossOne) checkBulletCollision() {
+
+	for b := range BulletObjects {
+		bullet, ok := b.(*Bullet)
+
+		// This should have to make sure that the bullet is owned by the player. otherwise this could result in friendly fire from other enemies
+		if ok && *bullet.Owner != *boss.Entity {
+
+			if CollidesAt(boss.Hitbox, boss.Position, bullet.Hitbox, bullet.Position) {
+
+				Destroy(bullet)
+				// Lower the hp of the boss by the value of the bullet's damage
+			}
+		}
+	}
+
 }
 
 func (boss *BossOne) Die() {
