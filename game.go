@@ -15,10 +15,10 @@ var backgroundImage = LoadImage("bg/img1.png", OriginTopLeft)
 
 // NewGame creates a new game instance
 func NewGame() *Game {
-	player := Spawn(NewPlayer(PlayerStart))
+	player := Spawn(NewPlayer(PlayerStart), CharacterQueue)
 
 	// Spawn boss
-	Spawn(NewBossOne(PlayfieldSize.Dot(OriginTop).Plus(Vector{Y: 100})))
+	Spawn(NewBossOne(PlayfieldSize.Dot(OriginTop).Plus(Vector{Y: 100})), CharacterQueue)
 
 	game := Game{
 		player: player,
@@ -40,7 +40,11 @@ func (game *Game) Draw(screen *ebiten.Image) {
 	game.background.Draw(gameView)
 
 	// Draw game objects
-	for obj := range GameObjects {
+	for obj := range CharacterObjects {
+		obj.Draw(gameView)
+	}
+
+	for obj := range BulletObjects {
 		obj.Draw(gameView)
 	}
 	drawGameView(screen)
@@ -63,10 +67,13 @@ func (game *Game) Update() error {
 	game.background.Update()
 	game.debugger.Update()
 
-	for obj := range GameObjects {
+	for obj := range BulletObjects {
+		obj.Update()
+	}
+	for obj := range CharacterObjects {
 		obj.Update()
 	}
 
-	SpawnGameObjects()
+	SpawnObjects()
 	return nil
 }

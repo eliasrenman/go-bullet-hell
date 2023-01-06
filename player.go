@@ -96,6 +96,7 @@ func (player *Player) Update() {
 				DegToRad(-90),
 				6,
 				25,
+				0,
 			)
 
 			player.lastShootTime = time.Now()
@@ -106,7 +107,7 @@ func (player *Player) Update() {
 // Die is called when the player dies
 func (player *Player) Die() {
 	// Make sure to clean up all the players bullets
-	for obj := range GameObjects {
+	for obj := range BulletObjects {
 		bullet, ok := obj.(*Bullet)
 		if ok && bullet.Entity == *player.Entity {
 			Destroy(bullet)

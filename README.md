@@ -19,3 +19,4 @@ Here is a list of the modules needed for my game
 * Game event handling, in progress
 * Game logic
 * Hitboxes and colision
+* Add Asteroids

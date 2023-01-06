@@ -28,38 +28,62 @@ type GameObject interface {
 	Draw(image *ebiten.Image)
 }
 
-// GameObjects is a set of all game objects
-var GameObjects = make(map[GameObject]struct{})
+// All background objects that should not interact with neither the CharcterObjects nor the BulletObjects.
+var BackgroundObjects = make(map[GameObject]struct{})
+
+// All objects that are characters, like the player and enemies.
+var CharacterObjects = make(map[GameObject]struct{})
+
+// BulletObjects is a set of all bullet objects
+var BulletObjects = make(map[GameObject]struct{})
 var mu sync.Mutex
 
 // The spawn queue is used to spawn new game objects in the next frame, to avoid concurrent map writes
-var spawnQueue = make(map[GameObject]struct{})
+var characterSpawnQueue = make(map[GameObject]struct{})
+
+// The spawn queue is used to spawn new game objects in the next frame, to avoid concurrent map writes
+var bulletSpawnQueue = make(map[GameObject]struct{})
+
+const (
+	CharacterQueue string = "character"
+	BulletQueue           = "bullet"
+)
 
 // Spawn creates a new copy of a game object
-func Spawn[T GameObject](obj T) T {
+func Spawn[T GameObject](obj T, queue string) T {
 	mu.Lock()
-	spawnQueue[obj] = struct{}{}
+
+	switch queue {
+	case CharacterQueue:
+		characterSpawnQueue[obj] = struct{}{}
+	case BulletQueue:
+		bulletSpawnQueue[obj] = struct{}{}
+	}
 	mu.Unlock()
 
 	obj.Start()
 	return obj
 }
 
-// SpawnGameObjects spawns all game objects in the spawn queue, and clears the queue.
+// SpawnObjects spawns all bullet objects in the spawn queue, and clears the queue.
 // This function is called at the end of each frame to avoid concurrent map writes.
-func SpawnGameObjects() {
+func SpawnObjects() {
 	mu.Lock()
-	for obj := range spawnQueue {
-		GameObjects[obj] = struct{}{}
+	for obj := range bulletSpawnQueue {
+		BulletObjects[obj] = struct{}{}
 	}
-	spawnQueue = make(map[GameObject]struct{})
+	bulletSpawnQueue = make(map[GameObject]struct{})
+	for obj := range characterSpawnQueue {
+		CharacterObjects[obj] = struct{}{}
+	}
+	characterSpawnQueue = make(map[GameObject]struct{})
 	mu.Unlock()
 }
 
 // Destroy a game object
 func Destroy(obj GameObject) {
 	obj.Die()
-	delete(GameObjects, obj)
+	delete(BulletObjects, obj)
 }
 
 // Bullet is an Entity with additional values for Damage, Size, Speed and Direction
@@ -71,7 +95,8 @@ type Bullet struct {
 	// Read-only! Use SetAngularVelocity to set the speed
 	Speed float64
 	// Read-only! Use SetAngularVelocity to set the direction
-	Direction float64
+	Direction  float64
+	BulletType int
 }
 
 // SetAngularVelocity sets the velocity of the bullet given a speed and a direction
@@ -82,15 +107,16 @@ func (b *Bullet) SetAngularVelocity(speed float64, direction float64) {
 }
 
 // Shoot spawns a bullet at a given position, with a given speed and direction
-func (entity *Entity) Shoot(position Vector, direction float64, speed float64, offset float64) {
+func (entity *Entity) Shoot(position Vector, direction float64, speed float64, offset float64, bulletType int) {
 
 	// This offests the inital position based on the direction of the bullet.
 	position.Add(VectorFromAngle(direction).ScaledBy(offset))
 
 	bullet := Spawn(&Bullet{
-		Entity: Entity{Position: position},
-		Owner:  entity,
-	})
+		Entity:     Entity{Position: position},
+		Owner:      entity,
+		BulletType: bulletType,
+	}, BulletQueue)
 	bullet.SetAngularVelocity(speed, direction)
 }
 
@@ -105,11 +131,25 @@ func (b *Bullet) Update() {
 	}
 }
 
-var bulletImage = LoadImage("bullets/bullet.png", OriginCenter)
+var bulletImage = LoadImage("bullets/bullet_0.png", OriginCenter)
+var bulletImage1 = LoadImage("bullets/bullet_1.png", OriginCenter)
+
+const (
+	BulletSmallBlue   = 0
+	BulletSmallYellow = 1
+)
 
 // Draw is called every frame to draw the bullet
 func (b *Bullet) Draw(screen *ebiten.Image) {
-	bulletImage.Draw(screen, b.Position, Vector{X: 1, Y: 1}, 0)
+	var bImage *Image
+	switch b.BulletType {
+	case BulletSmallYellow:
+		bImage = bulletImage1
+	default:
+		bImage = bulletImage
+	}
+
+	bImage.Draw(screen, b.Position, Vector{X: 1, Y: 1}, 0)
 }
 
 // Die is called when the bullet is destroyed

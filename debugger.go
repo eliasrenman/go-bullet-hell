@@ -98,7 +98,7 @@ Running on %v`,
 		debugger.startTime.Format("January 2 15:04:05"),
 		debugger.totalTime.Truncate(time.Second),
 		debugger.deltaTime.Truncate(time.Millisecond/100),
-		len(GameObjects),
+		len(BulletObjects),
 		getGraphicsLibraryName(int(debugger.graphicsLibrary)))
 
 	text.Draw(screen, debugText, debugger.font, int(PlayfieldSize.X)+100, 5, color.White)
