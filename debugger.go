@@ -118,9 +118,9 @@ func getGraphicsLibraryName(gl int) string {
 	case 1:
 		return "OpenGL"
 	case 2:
-		return "Metal"
-	case 3:
 		return "DirectX"
+	case 3:
+		return "Metal"
 	default:
 		return "Unknown"
 	}
