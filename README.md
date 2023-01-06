@@ -11,7 +11,11 @@ Here is a list of the modules needed for my game
  - Keyboard completed
  - Gamepad completed, in need of a cleanup
 * Animating
-  - Player animations are done
+  - Player animations are done.
+  - Enemy animations are done.
 * Ai
-* Game event handling
+ - Bullet patterns
+ - Movesets
+* Game event handling, in progress
 * Game logic
+* Hitboxes and colision
