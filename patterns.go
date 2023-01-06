@@ -47,10 +47,11 @@ var easings = map[string]func(float64) float64{
 // Pattern is a specific behavior an enemy can perform.
 // This can be a bullet pattern or a movement pattern, animations, etc.
 type Pattern struct {
-	Type     string
-	Options  map[string]any
-	Duration time.Duration
-	Cooldown time.Duration
+	Type       string
+	Options    map[string]any
+	Duration   time.Duration
+	Cooldown   time.Duration
+	BulletType int
 }
 
 // Option returns the value of a pattern option, or a default value if it isn't provided
@@ -80,7 +81,7 @@ func (p *Pattern) shootArcPattern(entity *Entity) {
 
 	for i := 0; i < count; i++ {
 		angle := from + (to-from)/float64(count)*float64(i)
-		entity.Shoot(entity.Position, angle, speed, 0)
+		entity.Shoot(entity.Position, angle, speed, 0, p.BulletType)
 		time.Sleep(time.Duration(stagger * float64(time.Second.Nanoseconds())))
 	}
 }
