@@ -101,6 +101,12 @@ func (player *Player) Update(game *Game) {
 		}
 	}
 	player.checkBulletCollision()
+
+	if player.Health.HitPoints == 0 {
+		game.GameOver()
+		return
+	}
+
 	// Handle shooting
 	if player.CanShoot && ButtonShoot.Get(0) {
 		if player.ShootSpeedThrottler.CanCall() {

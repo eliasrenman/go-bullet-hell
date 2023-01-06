@@ -9,6 +9,7 @@ type Game struct {
 	player     *Player
 	debugger   *Debugger
 	background Background
+	gameOver   bool
 }
 
 var backgroundImage = LoadImage("bg/img1.png", OriginTopLeft)
@@ -72,6 +73,10 @@ func drawGameView(screen *ebiten.Image) {
 
 // Update is the main update loop, called every game tick
 func (game *Game) Update() error {
+	if game.gameOver {
+		return nil
+	}
+
 	game.background.Update()
 	game.debugger.Update()
 
@@ -90,4 +95,8 @@ func (game *Game) Update() error {
 	}
 	SpawnObjects()
 	return nil
+}
+
+func (game *Game) GameOver() {
+	game.gameOver = true
 }

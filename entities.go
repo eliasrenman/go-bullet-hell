@@ -93,6 +93,12 @@ func Destroy(obj GameObject) {
 	delete(BulletObjects, obj)
 }
 
+// Destroy a Character object
+func DestroyCharacter(obj GameObject) {
+	obj.Die()
+	delete(CharacterObjects, obj)
+}
+
 // Bullet is an Entity with additional values for Damage, Size, Speed and Direction
 type Bullet struct {
 	*Entity

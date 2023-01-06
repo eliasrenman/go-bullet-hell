@@ -117,6 +117,9 @@ func (boss *BossOne) Start() {
 func (boss *BossOne) Update(game *Game) {
 	schedule.Update(boss.Entity)
 	boss.checkBulletCollision(game.player)
+	if boss.Health.HitPoints == 0 {
+		DestroyCharacter(boss)
+	}
 }
 
 func (boss *BossOne) checkBulletCollision(player *Player) {
@@ -139,5 +142,15 @@ func (boss *BossOne) checkBulletCollision(player *Player) {
 }
 
 func (boss *BossOne) Die() {
+	//cleanBossBullets(boss)
 
+	println("Boss One died")
+}
+func cleanBossBullets(boss *BossOne) {
+	for b := range BulletObjects {
+		bullet, ok := b.(*Bullet)
+		if ok && bullet.Owner == boss.Entity {
+			Destroy(bullet)
+		}
+	}
 }
