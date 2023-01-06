@@ -65,6 +65,7 @@ func CollidesAt(a Collidable, aPos Vector, b Collidable, bPos Vector) bool {
 }
 
 func (hb *RectangleHitbox) getRectangle(p Vector) (Vector, Vector) {
+
 	if hb.Owner == nil {
 		return hb.Position, hb.Position.Plus(hb.Size)
 	}
