@@ -1,38 +1,30 @@
 package main
 
 import (
-	"github.com/eliasrenman/go-bullet-hell/assets"
-	"github.com/eliasrenman/go-bullet-hell/constant"
-	"github.com/eliasrenman/go-bullet-hell/entity"
-	"github.com/eliasrenman/go-bullet-hell/geometry"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// Game is the main game instance
 type Game struct {
-	player     *entity.Player
+	player     *Player
 	debugger   *Debugger
-	background assets.Background
+	background Background
 }
 
-var backgroundImage = assets.LoadImage("bg/img1.png", assets.OriginTopLeft)
+var backgroundImage = LoadImage("bg/img1.png", OriginTopLeft)
 
-func InitalizeGame() *Game {
-	player := entity.Spawn(entity.NewPlayer(geometry.Point{
-		X: constant.INITIAL_PLAYER_X,
-		Y: constant.INITIAL_PLAYER_Y,
-	}))
+// NewGame creates a new game instance
+func NewGame() *Game {
+	player := Spawn(NewPlayer(PlayerStart))
 
 	// Spawn boss
-	entity.Spawn(entity.NewBossOne(geometry.Point{
-		X: constant.INITIAL_PLAYER_X,
-		Y: 200,
-	}))
+	Spawn(NewBossOne(PlayfieldSize.Dot(OriginTop).Plus(Vector{Y: 100})))
 
 	game := Game{
 		player: player,
-		background: assets.Background{
+		background: Background{
 			Image:    backgroundImage,
-			Velocity: geometry.Up.ScaledBy(constant.STANDARD_BACKGROUND_SPEED),
+			Velocity: Up.ScaledBy(BackgroundSpeed),
 		},
 		debugger: nil,
 	}
@@ -42,44 +34,49 @@ func InitalizeGame() *Game {
 	return &game
 }
 
+// Draw is the main draw loop, called every frame
 func (game *Game) Draw(screen *ebiten.Image) {
 	// Draw background
 	game.background.Draw(gameView)
 
 	// Draw game objects
-	for obj := range entity.GameObjects {
+	for obj := range GameObjects {
 		obj.Draw(gameView)
 	}
-	DrawGameView(screen)
+	drawGameView(screen)
 	game.debugger.Draw(screen)
 }
 
-var gameView = ebiten.NewImage(constant.PLAYFIELD_WIDTH, constant.PLAYFIELD_HEIGHT)
+var gameView = ebiten.NewImage(int(PlayfieldSize.X), int(PlayfieldSize.Y))
 
-func DrawGameView(screen *ebiten.Image) {
+func drawGameView(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	position := geometry.Point{X: float64(constant.PLAYFIELD_OFFSET), Y: float64(constant.PLAYFIELD_OFFSET)}
+	position := PlayfieldOffset
 
-	assets.TranslateScaleAndRotateImage(&op.GeoM, position, geometry.Size{Width: 1, Height: 1}, 0)
+	translateScaleAndRotateImage(&op.GeoM, position, Vector{X: 1, Y: 1}, 0)
 
 	screen.DrawImage(gameView, op)
 }
 
+// Update is the main update loop, called every game tick
 func (game *Game) Update() error {
 	updateGameBackgroundSpeed(game)
 	game.background.Update()
 	game.debugger.Update()
-	for obj := range entity.GameObjects {
+
+	for obj := range GameObjects {
 		obj.Update()
 	}
+
+	SpawnGameObjects()
 	return nil
 }
 
 func updateGameBackgroundSpeed(game *Game) {
 	if game.player.Velocity.Y != 0 {
-		offsetVelocity := ((game.player.Velocity.Y * -1) + constant.PLAYER_SPEED) / 2
-		game.background.Velocity = geometry.Up.ScaledBy(offsetVelocity + 1)
+		offsetVelocity := game.player.Velocity.Y*-0.5 + PlayerSpeed/2
+		game.background.Velocity = Up.ScaledBy(offsetVelocity + 1)
 	} else {
-		game.background.Velocity = geometry.Up.ScaledBy(constant.STANDARD_BACKGROUND_SPEED)
+		game.background.Velocity = Up.ScaledBy(BackgroundSpeed)
 	}
 }
