@@ -1,8 +1,7 @@
 package main
 
 import (
-	"image/color"
-
+	"github.com/fogleman/gg"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -21,57 +20,69 @@ type Hitbox struct {
 type CircleHitbox struct {
 	Hitbox
 	Radius float64
+	image  *ebiten.Image
 }
 
 // Draw function that will draw the CircleHitboxes borders
 func (hb *CircleHitbox) Draw(screen *ebiten.Image, position Vector) {
-	Image := ebiten.NewImage(int(hb.Radius*2), int(hb.Radius*2))
 
 	op := &ebiten.DrawImageOptions{}
 	position.Add(hb.Position)
 	op.GeoM.Translate(position.X, position.Y)
-
-	purpleCol := color.RGBA{255, 0, 255, 255}
+	if hb.image == nil {
+		hb.image = generateCircleHitboxImage(hb)
+	}
+	screen.DrawImage(hb.image, op)
+}
+func generateCircleHitboxImage(hb *CircleHitbox) *ebiten.Image {
+	dc := gg.NewContext(int(hb.Radius*2), int(hb.Radius*2))
+	dc.SetRGB255(255, 0, 255)
 	// Draw the borders around the min and max of the rectangle in purple
-	drawLineX(Image, 0, 0, hb.Radius*2, purpleCol)
-	drawLineX(Image, 0, hb.Radius*2-1, hb.Radius*2, purpleCol)
-	drawLineY(Image, 0, 0, hb.Radius*2, purpleCol)
-	drawLineY(Image, hb.Radius*2-1, 0, hb.Radius*2, purpleCol)
-	screen.DrawImage(Image, op)
+	drawLineX(dc, 0, 0, hb.Radius*2)
+	drawLineX(dc, 0, hb.Radius*2-1, hb.Radius*2)
+	drawLineY(dc, 0, 0, hb.Radius*2)
+	drawLineY(dc, hb.Radius*2-1, 0, hb.Radius*2)
+
+	return ebiten.NewImageFromImage(dc.Image())
 }
 
 // RectangleHitbox is a rectangular hitbox
 type RectangleHitbox struct {
 	Hitbox
-	Size Vector
+	Size  Vector
+	image *ebiten.Image
 }
 
 // Draw function that will draw the RectangleHitboxes borders
 func (hb *RectangleHitbox) Draw(screen *ebiten.Image, position Vector) {
 
-	Image := ebiten.NewImage(int(hb.Size.X), int(hb.Size.Y))
-
 	op := &ebiten.DrawImageOptions{}
 	position.Add(hb.Position)
 	op.GeoM.Translate(position.X, position.Y)
-
-	purpleCol := color.RGBA{255, 0, 255, 255}
-	// Draw the borders around the min and max of the rectangle in purple
-	drawLineX(Image, 0, 0, hb.Size.X, purpleCol)
-	drawLineX(Image, 0, hb.Size.Y-1, hb.Size.X, purpleCol)
-	drawLineY(Image, 0, 0, hb.Size.Y, purpleCol)
-	drawLineY(Image, hb.Size.X-1, 0, hb.Size.Y, purpleCol)
-	screen.DrawImage(Image, op)
+	if hb.image == nil {
+		hb.image = generateRectHitboxImage(hb)
+	}
+	screen.DrawImage(hb.image, op)
 }
 
-func drawLineX(screen *ebiten.Image, x, y, length float64, col color.RGBA) {
+func generateRectHitboxImage(hb *RectangleHitbox) *ebiten.Image {
+	dc := gg.NewContext(int(hb.Size.X), int(hb.Size.Y))
+	dc.SetRGB255(255, 0, 255)
+	drawLineX(dc, 0, 0, hb.Size.X)
+	drawLineX(dc, 0, hb.Size.Y-1, hb.Size.X)
+	drawLineY(dc, 0, 0, hb.Size.Y)
+	drawLineY(dc, hb.Size.X-1, 0, hb.Size.Y)
+	return ebiten.NewImageFromImage(dc.Image())
+}
+
+func drawLineX(screen *gg.Context, x, y, length float64) {
 	for x := 0.; x < length; x++ {
-		screen.Set(int(x), int(y), col)
+		screen.SetPixel(int(x), int(y))
 	}
 }
-func drawLineY(screen *ebiten.Image, x, y, length float64, col color.RGBA) {
+func drawLineY(screen *gg.Context, x, y, length float64) {
 	for y := 0.; y < length; y++ {
-		screen.Set(int(x), int(y), col)
+		screen.SetPixel(int(x), int(y))
 	}
 }
 func collisionRectangleRectangle(a *RectangleHitbox, aPos Vector, b *RectangleHitbox, bPos Vector) bool {
