@@ -15,8 +15,8 @@ type Player struct {
 	ShootSpeedThrottler Throttler
 	CanShoot            bool
 
-	MoveHitbox          Collidable
-	DamageHitbox        Collidable
+	MoveHitbox          *RectangleHitbox
+	DamageHitbox        *CircleHitbox
 	showHitbox          bool
 	hit                 bool
 	hitCleanupCounter   int
@@ -49,7 +49,7 @@ func NewPlayer(position Vector) *Player {
 	player.DamageHitbox = &CircleHitbox{
 		Radius: 4,
 		Hitbox: Hitbox{
-			Position: Vector{},
+			Position: Vector{X: -4, Y: -4},
 			Owner:    player.Entity,
 		},
 	}
@@ -184,5 +184,10 @@ func (player *Player) Draw(screen *ebiten.Image) {
 	image.Draw(screen, player.Position, Vector{X: 1, Y: 1}, 0)
 	if player.showHitbox {
 		playerHitbox.Draw(screen, player.Position, Vector{X: 1, Y: 1}, 0)
+
+	}
+	if HitboxesVisible {
+		player.MoveHitbox.Draw(screen, player.Position)
+		player.DamageHitbox.Draw(screen, player.Position)
 	}
 }

@@ -1,7 +1,15 @@
 package main
 
+import (
+	"image/color"
+
+	"github.com/hajimehoshi/ebiten/v2"
+)
+
 // Collidable structs can be checked for collisions
-type Collidable = any
+type Collidable interface {
+	Draw(image *ebiten.Image, position Vector)
+}
 
 // Hitbox is a base struct for all hitboxes
 type Hitbox struct {
@@ -15,12 +23,57 @@ type CircleHitbox struct {
 	Radius float64
 }
 
+// Draw function that will draw the CircleHitboxes borders
+func (hb *CircleHitbox) Draw(screen *ebiten.Image, position Vector) {
+	Image := ebiten.NewImage(int(hb.Radius*2), int(hb.Radius*2))
+
+	op := &ebiten.DrawImageOptions{}
+	position.Add(hb.Position)
+	op.GeoM.Translate(position.X, position.Y)
+
+	purpleCol := color.RGBA{255, 0, 255, 255}
+	// Draw the borders around the min and max of the rectangle in purple
+	drawLineX(Image, 0, 0, hb.Radius*2, purpleCol)
+	drawLineX(Image, 0, hb.Radius*2-1, hb.Radius*2, purpleCol)
+	drawLineY(Image, 0, 0, hb.Radius*2, purpleCol)
+	drawLineY(Image, hb.Radius*2-1, 0, hb.Radius*2, purpleCol)
+	screen.DrawImage(Image, op)
+}
+
 // RectangleHitbox is a rectangular hitbox
 type RectangleHitbox struct {
 	Hitbox
 	Size Vector
 }
 
+// Draw function that will draw the RectangleHitboxes borders
+func (hb *RectangleHitbox) Draw(screen *ebiten.Image, position Vector) {
+
+	Image := ebiten.NewImage(int(hb.Size.X), int(hb.Size.Y))
+
+	op := &ebiten.DrawImageOptions{}
+	position.Add(hb.Position)
+	op.GeoM.Translate(position.X, position.Y)
+
+	purpleCol := color.RGBA{255, 0, 255, 255}
+	// Draw the borders around the min and max of the rectangle in purple
+	drawLineX(Image, 0, 0, hb.Size.X, purpleCol)
+	drawLineX(Image, 0, hb.Size.Y-1, hb.Size.X, purpleCol)
+	drawLineY(Image, 0, 0, hb.Size.Y, purpleCol)
+	drawLineY(Image, hb.Size.X-1, 0, hb.Size.Y, purpleCol)
+	screen.DrawImage(Image, op)
+}
+
+func drawLineX(screen *ebiten.Image, x, y, length float64, col color.RGBA) {
+	for x := 0.; x < length; x++ {
+		screen.Set(int(x), int(y), col)
+	}
+}
+func drawLineY(screen *ebiten.Image, x, y, length float64, col color.RGBA) {
+	for y := 0.; y < length; y++ {
+		screen.Set(int(x), int(y), col)
+	}
+}
 func collisionRectangleRectangle(a *RectangleHitbox, aPos Vector, b *RectangleHitbox, bPos Vector) bool {
 	aMin, aMax := a.getRectangle(aPos)
 	bMin, bMax := b.getRectangle(bPos)

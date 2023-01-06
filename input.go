@@ -41,6 +41,9 @@ var (
 	ButtonDebug = button{
 		key: ebiten.KeyF3,
 	}
+	ButtonDebugHitbox = button{
+		key: ebiten.KeyF2,
+	}
 )
 
 func (axis *axis) Get(gp ebiten.GamepadID) float64 {

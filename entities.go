@@ -133,9 +133,9 @@ func (entity *Entity) Shoot(position Vector, direction float64, speed float64, o
 func getBulletHitbox(bulletType int, owner *Bullet) *CircleHitbox {
 	switch bulletType {
 	case BulletSmallYellow:
-		return &CircleHitbox{Radius: 4, Hitbox: Hitbox{Position: Vector{}, Owner: owner.Entity}}
+		return &CircleHitbox{Radius: 4, Hitbox: Hitbox{Position: Vector{X: -4, Y: -4}, Owner: owner.Entity}}
 	default:
-		return &CircleHitbox{Radius: 4, Hitbox: Hitbox{Position: Vector{}, Owner: owner.Entity}}
+		return &CircleHitbox{Radius: 4, Hitbox: Hitbox{Position: Vector{X: -4, Y: -4}, Owner: owner.Entity}}
 	}
 }
 
@@ -169,6 +169,9 @@ func (b *Bullet) Draw(screen *ebiten.Image) {
 	}
 
 	bImage.Draw(screen, b.Position, Vector{X: 1, Y: 1}, 0)
+	if HitboxesVisible {
+		b.Hitbox.Draw(screen, b.Position)
+	}
 }
 
 // Die is called when the bullet is destroyed

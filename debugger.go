@@ -37,6 +37,8 @@ func NewDebugger(game *Game) *Debugger {
 	}
 }
 
+var HitboxesVisible = false
+
 // Update updates the debugger information
 func (debugger *Debugger) Update() error {
 	// Toggle debug mode
@@ -48,6 +50,10 @@ func (debugger *Debugger) Update() error {
 		} else {
 			debugger.Stop()
 		}
+	}
+	if ButtonDebugHitbox.GetPressed(0) {
+		HitboxesVisible = !HitboxesVisible
+
 	}
 
 	debugger.fps = ebiten.ActualFPS()
@@ -86,20 +92,21 @@ func (debugger *Debugger) Draw(screen *ebiten.Image) {
 		return
 	}
 
-	// Draw debug text
 	debugText := fmt.Sprintf(`
 FPS: %.2f
 Playing since: %v
 Total play time: %v
 Frame time: %v,
 Total Game Objects: %v
-Running on %v`,
+Running on %v
+Showing Hitboxes: %t, ("F2" to toggle))`,
 		debugger.fps,
 		debugger.startTime.Format("January 2 15:04:05"),
 		debugger.totalTime.Truncate(time.Second),
 		debugger.deltaTime.Truncate(time.Millisecond/100),
 		len(BulletObjects),
-		getGraphicsLibraryName(int(debugger.graphicsLibrary)))
+		getGraphicsLibraryName(int(debugger.graphicsLibrary)),
+		HitboxesVisible)
 
 	text.Draw(screen, debugText, debugger.font, int(PlayfieldSize.X)+100, 5, color.White)
 
