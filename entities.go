@@ -96,7 +96,7 @@ func Destroy(obj GameObject) {
 // Bullet is an Entity with additional values for Damage, Size, Speed and Direction
 type Bullet struct {
 	Entity
-	Hitbox Collidable
+	Collidable
 	Owner  *Entity
 	Damage int
 
@@ -124,18 +124,28 @@ func (entity *Entity) Shoot(position Vector, direction float64, speed float64, o
 		Entity:     Entity{Position: position},
 		Owner:      entity,
 		BulletType: bulletType,
-		Hitbox:     getBulletHitbox(bulletType),
+		Collidable: getBulletHitbox(bulletType, entity),
 	}, BulletQueue)
 
 	bullet.SetAngularVelocity(speed, direction)
 }
 
-func getBulletHitbox(bulletType int) CircleHitbox {
+func getBulletHitbox(bulletType int, entity *Entity) CircleHitbox {
 	switch bulletType {
 	case BulletSmallYellow:
-		return CircleHitbox{Radius: 4}
+		return CircleHitbox{
+			Radius: 4,
+			Hitbox: Hitbox{
+				Owner: entity,
+			},
+		}
 	default:
-		return CircleHitbox{Radius: 4}
+		return CircleHitbox{
+			Radius: 4,
+			Hitbox: Hitbox{
+				Owner: entity,
+			},
+		}
 	}
 }
 
