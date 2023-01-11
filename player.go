@@ -139,20 +139,22 @@ func (player *Player) checkBulletCollision() {
 	cleanupHitbox := &CircleHitbox{
 		Radius: float64(player.hitCleanupCounter),
 	}
-	for b := range BulletObjects {
-		bullet, ok := b.(*Bullet)
+	for _, objects := range GameObjects {
+		for obj := range objects {
+			bullet, ok := obj.(*Bullet)
 
-		if ok && *bullet.Owner != *player.Entity {
+			if ok && bullet.Owner != player.Entity {
+				if CollidesAt(cleanupHitbox, player.Position, bullet.Hitbox, bullet.Position) {
+					bulletsInMoveHitbox[bullet] = struct{}{}
+				}
 
-			if CollidesAt(cleanupHitbox, player.Position, bullet.Hitbox, bullet.Position) {
-				bulletsInMoveHitbox[bullet] = struct{}{}
-			}
-			if !player.hit && CollidesAt(player.DamageHitbox, player.Position, bullet.Hitbox, bullet.Position) {
-				player.hit = true
-				player.hitCleanupCounter = 0
+				if !player.hit && CollidesAt(player.DamageHitbox, player.Position, bullet.Hitbox, bullet.Position) {
+					player.hit = true
+					player.hitCleanupCounter = 0
 
-				player.Health.TakeDamage(bullet)
-				Destroy(bullet)
+					player.Health.TakeDamage(bullet)
+					Destroy(bullet)
+				}
 			}
 		}
 	}
@@ -167,12 +169,12 @@ func (player *Player) checkBulletCollision() {
 // Die is called when the player dies
 func (player *Player) Die() {
 	// Make sure to clean up all the players bullets
-	for obj := range BulletObjects {
+	EachGameObject(func(obj GameObject, layer int) {
 		bullet, ok := obj.(*Bullet)
-		if ok && *bullet.Entity == *player.Entity {
-			Destroy(bullet)
+		if ok && bullet.Owner == player.Entity {
+			Destroy(obj)
 		}
-	}
+	})
 }
 
 var (

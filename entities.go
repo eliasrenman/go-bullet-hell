@@ -28,24 +28,12 @@ type GameObject interface {
 	Draw(image *ebiten.Image)
 }
 
-// All background objects that should not interact with neither the CharcterObjects nor the BulletObjects.
-var BackgroundObjects = make(map[GameObject]struct{})
-
-// All objects that are characters, like the player and enemies.
-var CharacterObjects = make(map[GameObject]struct{})
-
-// BulletObjects is a set of all bullet objects
-var BulletObjects = make(map[GameObject]struct{})
+// GameObjects is a set of all objects
+var GameObjects = make([]map[GameObject]struct{}, 3)
 var mu sync.Mutex
 
 // The spawn queue is used to spawn new background objects in the next frame, to avoid concurrent map writes
-var backgroundSpawnQueue = make(map[GameObject]struct{})
-
-// The spawn queue is used to spawn new character objects in the next frame, to avoid concurrent map writes
-var characterSpawnQueue = make(map[GameObject]struct{})
-
-// The spawn queue is used to spawn new bullet objects in the next frame, to avoid concurrent map writes
-var bulletSpawnQueue = make(map[GameObject]struct{})
+var spawnQueue = make(map[GameObject]int)
 
 const (
 	CharacterQueue string = "character"
@@ -53,50 +41,45 @@ const (
 )
 
 // Spawn creates a new copy of a game object
-func Spawn[T GameObject](obj T, queue string) T {
+func Spawn[T GameObject](obj T, layer int) T {
 	mu.Lock()
-
-	switch queue {
-	case CharacterQueue:
-		characterSpawnQueue[obj] = struct{}{}
-	case BulletQueue:
-		bulletSpawnQueue[obj] = struct{}{}
-	}
+	spawnQueue[obj] = layer
 	mu.Unlock()
 
 	obj.Start()
 	return obj
 }
 
-// SpawnObjects spawns all bullet objects in the spawn queue, and clears the queue.
+// EachGameObject iterates over all game objects in all layers
+func EachGameObject(f func(GameObject, int)) {
+	for layer, objects := range GameObjects {
+		for obj := range objects {
+			f(obj, layer)
+		}
+	}
+}
+
+// SpawnObjects spawns all objects in the spawn queue, and clears the queue.
 // This function is called at the end of each frame to avoid concurrent map writes.
 func SpawnObjects() {
 	mu.Lock()
-	for obj := range bulletSpawnQueue {
-		BulletObjects[obj] = struct{}{}
+	for obj, layer := range spawnQueue {
+		if GameObjects[layer] == nil {
+			GameObjects[layer] = make(map[GameObject]struct{})
+		}
+
+		GameObjects[layer][obj] = struct{}{}
 	}
-	bulletSpawnQueue = make(map[GameObject]struct{})
-	for obj := range characterSpawnQueue {
-		CharacterObjects[obj] = struct{}{}
-	}
-	characterSpawnQueue = make(map[GameObject]struct{})
-	for obj := range backgroundSpawnQueue {
-		CharacterObjects[obj] = struct{}{}
-	}
-	backgroundSpawnQueue = make(map[GameObject]struct{})
+	spawnQueue = make(map[GameObject]int)
 	mu.Unlock()
 }
 
 // Destroy a game object
 func Destroy(obj GameObject) {
 	obj.Die()
-	delete(BulletObjects, obj)
-}
-
-// Destroy a Character object
-func DestroyCharacter(obj GameObject) {
-	obj.Die()
-	delete(CharacterObjects, obj)
+	for i := 0; i < len(GameObjects); i++ {
+		delete(GameObjects[i], obj)
+	}
 }
 
 // Bullet is an Entity with additional values for Damage, Size, Speed and Direction
@@ -132,7 +115,7 @@ func (entity *Entity) Shoot(position Vector, direction float64, speed float64, o
 		BulletType: bulletType,
 		Damage:     damage,
 		//Collidable:     getBulletHitbox(bulletType),
-	}, BulletQueue)
+	}, 2)
 	bullet.Hitbox = getBulletHitbox(bulletType, bullet)
 	bullet.SetAngularVelocity(speed, direction)
 }

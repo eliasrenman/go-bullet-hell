@@ -118,39 +118,29 @@ func (boss *BossOne) Update(game *Game) {
 	schedule.Update(boss.Entity)
 	boss.checkBulletCollision(game.player)
 	if boss.Health.HitPoints == 0 {
-		DestroyCharacter(boss)
+		Destroy(boss)
 	}
 }
 
 func (boss *BossOne) checkBulletCollision(player *Player) {
-
-	for b := range BulletObjects {
-		bullet, ok := b.(*Bullet)
-
-		// This should have to make sure that the bullet is owned by the player. otherwise this could result in friendly fire from other enemies
-		if ok && *bullet.Owner == *player.Entity {
-
-			if CollidesAt(boss.Hitbox, boss.Position, bullet.Hitbox, bullet.Position) {
-				boss.Health.TakeDamage(bullet)
-				// Lower the hp of the boss by the value of the bullet's damage
-				Destroy(bullet)
-
-			}
+	EachGameObject(func(obj GameObject, layer int) {
+		bullet, ok := obj.(*Bullet)
+		if ok && bullet.Owner == player.Entity && CollidesAt(boss.Hitbox, boss.Position, bullet.Hitbox, bullet.Position) {
+			println(bullet)
+			boss.Health.TakeDamage(bullet)
+			Destroy(bullet)
 		}
-	}
-
+	})
 }
 
 func (boss *BossOne) Die() {
-	//cleanBossBullets(boss)
-
-	println("Boss One died")
-}
-func cleanBossBullets(boss *BossOne) {
-	for b := range BulletObjects {
-		bullet, ok := b.(*Bullet)
+	EachGameObject(func(obj GameObject, layer int) {
+		// Cleanup bullets
+		bullet, ok := obj.(*Bullet)
 		if ok && bullet.Owner == boss.Entity {
 			Destroy(bullet)
 		}
-	}
+	})
+
+	println("Boss One died")
 }

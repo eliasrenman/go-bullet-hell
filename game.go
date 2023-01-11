@@ -16,11 +16,11 @@ var backgroundImage = LoadImage("bg/img1.png", OriginTopLeft)
 
 // NewGame creates a new game instance
 func NewGame() *Game {
-	player := Spawn(NewPlayer(PlayerStart), CharacterQueue)
+	player := Spawn(NewPlayer(PlayerStart), 1)
 
 	SpawnHealthBar(NewGuiHealthBar(player.Health, PlayfieldSize.X+100, 250, "Player"))
 	// Spawn boss
-	bossOne := Spawn(NewBossOne(PlayfieldSize.Dot(OriginTop).Plus(Vector{Y: 100})), CharacterQueue)
+	bossOne := Spawn(NewBossOne(PlayfieldSize.Dot(OriginTop).Plus(Vector{Y: 100})), 1)
 	SpawnHealthBar(NewGuiHealthBar(bossOne.Health, PlayfieldSize.X+100, 265, "Boss 1"))
 	game := Game{
 		player: player,
@@ -40,22 +40,16 @@ func NewGame() *Game {
 func (game *Game) Draw(screen *ebiten.Image) {
 	// Draw background
 	game.background.Draw(gameView)
-
-	// Draw game objects
-	for obj := range BackgroundObjects {
-		obj.Draw(gameView)
-	}
-	for obj := range CharacterObjects {
-		obj.Draw(gameView)
-	}
-
-	for obj := range BulletObjects {
-		obj.Draw(gameView)
+	for _, objects := range GameObjects {
+		for obj := range objects {
+			obj.Draw(gameView)
+		}
 	}
 
 	for obj := range GuiElements {
 		obj.Draw(screen)
 	}
+
 	drawGameView(screen)
 	game.debugger.Draw(screen)
 }
@@ -80,14 +74,10 @@ func (game *Game) Update() error {
 	game.background.Update()
 	game.debugger.Update()
 
-	for obj := range BackgroundObjects {
-		obj.Update(game)
-	}
-	for obj := range BulletObjects {
-		obj.Update(game)
-	}
-	for obj := range CharacterObjects {
-		obj.Update(game)
+	for _, objects := range GameObjects {
+		for obj := range objects {
+			obj.Update(game)
+		}
 	}
 
 	for obj := range GuiElements {
