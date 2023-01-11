@@ -40,11 +40,9 @@ func NewGame() *Game {
 func (game *Game) Draw(screen *ebiten.Image) {
 	// Draw background
 	game.background.Draw(gameView)
-	for _, objects := range GameObjects {
-		for obj := range objects {
-			obj.Draw(gameView)
-		}
-	}
+	EachGameObject(func(obj GameObject, layer int) {
+		obj.Draw(gameView)
+	})
 
 	for obj := range GuiElements {
 		obj.Draw(screen)
@@ -74,11 +72,9 @@ func (game *Game) Update() error {
 	game.background.Update()
 	game.debugger.Update()
 
-	for _, objects := range GameObjects {
-		for obj := range objects {
-			obj.Update(game)
-		}
-	}
+	EachGameObject(func(obj GameObject, layer int) {
+		obj.Update(game)
+	})
 
 	for obj := range GuiElements {
 		obj.Update()

@@ -160,7 +160,6 @@ func (player *Player) checkBulletCollision() {
 	}
 	if player.hit {
 		for b := range bulletsInMoveHitbox {
-
 			Destroy(b)
 		}
 	}
@@ -174,7 +173,7 @@ func (player *Player) Die() {
 		if ok && bullet.Owner == player.Entity {
 			Destroy(obj)
 		}
-	})
+	}, BulletLayer)
 }
 
 var (

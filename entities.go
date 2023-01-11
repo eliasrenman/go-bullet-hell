@@ -29,6 +29,10 @@ type GameObject interface {
 }
 
 // GameObjects is a set of all objects
+var BackgroundLayer = 0
+var CharacterLayer = 1
+var BulletLayer = 2
+
 var GameObjects = make([]map[GameObject]struct{}, 3)
 var mu sync.Mutex
 
@@ -50,13 +54,22 @@ func Spawn[T GameObject](obj T, layer int) T {
 	return obj
 }
 
-// EachGameObject iterates over all game objects in all layers
-func EachGameObject(f func(GameObject, int)) {
-	for layer, objects := range GameObjects {
-		for obj := range objects {
-			f(obj, layer)
+// EachGameObject iterates over all game objects in the specified layers (or all layers if none are specified)
+func EachGameObject(f func(GameObject, int), layers ...int) {
+	if layers == nil {
+		for layer, objects := range GameObjects {
+			for obj := range objects {
+				f(obj, layer)
+			}
+		}
+	} else {
+		for _, layer := range layers {
+			for obj := range GameObjects[layer] {
+				f(obj, layer)
+			}
 		}
 	}
+
 }
 
 // SpawnObjects spawns all objects in the spawn queue, and clears the queue.

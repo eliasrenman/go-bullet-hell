@@ -126,11 +126,10 @@ func (boss *BossOne) checkBulletCollision(player *Player) {
 	EachGameObject(func(obj GameObject, layer int) {
 		bullet, ok := obj.(*Bullet)
 		if ok && bullet.Owner == player.Entity && CollidesAt(boss.Hitbox, boss.Position, bullet.Hitbox, bullet.Position) {
-			println(bullet)
 			boss.Health.TakeDamage(bullet)
 			Destroy(bullet)
 		}
-	})
+	}, BulletLayer)
 }
 
 func (boss *BossOne) Die() {
@@ -140,7 +139,7 @@ func (boss *BossOne) Die() {
 		if ok && bullet.Owner == boss.Entity {
 			Destroy(bullet)
 		}
-	})
+	}, BulletLayer)
 
 	println("Boss One died")
 }
