@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -135,34 +137,40 @@ func (player *Player) Update(game *Game) {
 }
 
 func (player *Player) checkBulletCollision() {
-	bulletsInMoveHitbox := make(map[*Bullet]struct{})
-	cleanupHitbox := &CircleHitbox{
-		Radius: float64(player.hitCleanupCounter),
-	}
-	for _, objects := range GameObjects {
-		for obj := range objects {
-			bullet, ok := obj.(*Bullet)
+	EachGameObject(func(obj GameObject, layer int) {
+		bullet, ok := obj.(*Bullet)
 
-			if ok && bullet.Owner != player.Entity {
-				if CollidesAt(cleanupHitbox, player.Position, bullet.Hitbox, bullet.Position) {
-					bulletsInMoveHitbox[bullet] = struct{}{}
-				}
+		if ok && bullet.Owner != player.Entity {
+			if !player.hit && CollidesAt(player.DamageHitbox, player.Position, bullet.Hitbox, bullet.Position) {
+				player.hit = true
+				player.hitCleanupCounter = 0
 
-				if !player.hit && CollidesAt(player.DamageHitbox, player.Position, bullet.Hitbox, bullet.Position) {
-					player.hit = true
-					player.hitCleanupCounter = 0
-
-					player.Health.TakeDamage(bullet)
-					Destroy(bullet)
-				}
+				player.Health.TakeDamage(bullet)
+				Destroy(bullet)
 			}
 		}
-	}
+	}, BulletLayer)
+
 	if player.hit {
-		for b := range bulletsInMoveHitbox {
-			Destroy(b)
-		}
+		player.clearBullets(float64(player.hitCleanupCounter))
 	}
+}
+
+func (player *Player) clearBullets(maxDistance float64) {
+	EachGameObject(func(obj GameObject, layer int) {
+		bullet, ok := obj.(*Bullet)
+
+		if ok && bullet.Owner != player.Entity {
+			distanceSquared := player.Position.DistanceSquared(bullet.Position)
+			if distanceSquared > maxDistance*maxDistance {
+				// Animate the destruction of the bullet, in a circular fashion
+				go func() {
+					time.Sleep(time.Duration(distanceSquared * float64(time.Millisecond)))
+					Destroy(bullet)
+				}()
+			}
+		}
+	}, BulletLayer)
 }
 
 // Die is called when the player dies
