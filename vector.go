@@ -29,6 +29,13 @@ func VectorFromAngle(angle float64) Vector {
 	}
 }
 
+func VectorFromMap(data map[string]float64) Vector {
+	return Vector{
+		X: data["x"],
+		Y: data["y"],
+	}
+}
+
 // Magnitude calculates the magnitude (length) of the vector
 func (vector Vector) Magnitude() float64 {
 	return math.Sqrt(vector.X*vector.X + vector.Y*vector.Y)

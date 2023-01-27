@@ -1,40 +1,61 @@
 package main
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type Level struct {
 	Events []Event
-	index  int
 }
 
 type Event struct {
 	Type     string
 	Blocking bool
-	Cooldown time.Duration
-	Options  map[string]any
+	Cooldown float64
+	Options  EventOptions
+}
+
+type EventOptions struct {
+	Enemies []EnemySpawnOptions
+}
+
+type EnemySpawnOptions struct {
+	Enemy    string
+	Position Vector
 }
 
 func (level *Level) Start() {
 	for _, event := range level.Events {
 		event.Start()
-		time.Sleep(event.Cooldown)
+		time.Sleep(time.Duration(event.Cooldown * float64(time.Second)))
 	}
 }
 
 func (event *Event) Start() {
-	var eventFn func(map[string]any)
+	fmt.Println("Starting event", event.Type)
+
+	var eventFn func()
 	switch event.Type {
 	case "spawn":
-		eventFn = spawnEvent
+		eventFn = event.spawnEvent
 	}
 
 	if event.Blocking {
-		eventFn(event.Options)
+		eventFn()
 	} else {
-		go eventFn(event.Options)
+		go eventFn()
 	}
 }
 
-func spawnEvent(options map[string]any) {
-	// TODO: Spawn logic here
+func (e *Event) spawnEvent() {
+	fmt.Printf("Spawning enemies: %v\n", e.Options.Enemies)
+
+	for _, options := range e.Options.Enemies {
+		println(options.Enemy)
+		enemy := LoadEnemy(options.Enemy)
+		println(enemy)
+		instance := enemy.Spawn()
+		instance.Position = options.Position
+	}
 }

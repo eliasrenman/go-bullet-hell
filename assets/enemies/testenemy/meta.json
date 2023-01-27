@@ -1,0 +1,33 @@
+{
+    "name": "Test Enemy",
+    "health": 10,
+    "type": "enemy",
+    "schedule": {
+        "patterns": [
+            {
+                "type": "move_by",
+                "options": {
+                    "amount": {
+                        "x": 30,
+                        "y": 50
+                    },
+                    "speed": 58.3,
+                    "easing": "sine_in"
+                },
+                "duration": 1
+            },
+            {
+                "type": "move_by",
+                "options": {
+                    "amount": {
+                        "x": -30,
+                        "y": 50
+                    },
+                    "speed": 58.3,
+                    "easing": "sine_in"
+                },
+                "duration": 1
+            }
+        ]
+    }
+}

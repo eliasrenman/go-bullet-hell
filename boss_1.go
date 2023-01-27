@@ -1,9 +1,6 @@
 package main
 
 import (
-	"math"
-	"time"
-
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -43,73 +40,7 @@ func (boss *BossOne) Draw(screen *ebiten.Image) {
 	}
 }
 
-var schedule = Schedule{
-	Patterns: []Pattern{
-		{
-			Type: "shoot_arc",
-			Options: map[string]interface{}{
-				"count": 30,
-				"speed": 1.0,
-				"from":  0.25 * math.Pi,
-				"to":    .75 * math.Pi,
-			},
-			Duration:   1 * time.Second,
-			Cooldown:   1 * time.Second,
-			BulletType: BulletSmallYellow,
-		},
-		{
-			Type: "move_to",
-			Options: map[string]interface{}{
-				"target": Vector{X: 100, Y: 100},
-				"speed":  100.0,
-				"easing": "quad",
-			},
-			Duration: 2 * time.Second,
-		},
-		{
-			Type: "shoot_arc",
-			Options: map[string]interface{}{
-				"count":   30,
-				"speed":   1.0,
-				"from":    0 * math.Pi,
-				"to":      2 * math.Pi,
-				"stagger": 1.0 / 30,
-			},
-			BulletType: BulletSmallYellow,
-		},
-		{
-			Type: "move_to",
-			Options: map[string]interface{}{
-				"target": Vector{X: 400, Y: 100},
-				"speed":  100.0,
-				"easing": "quad",
-			},
-			Duration: 1 * time.Second,
-		},
-		{
-			Type: "shoot_arc",
-			Options: map[string]interface{}{
-				"count":   30,
-				"speed":   1.0,
-				"from":    1 * math.Pi,
-				"to":      3 * math.Pi,
-				"stagger": 1.0 / 30,
-			},
-			Duration:   2 * time.Second,
-			Cooldown:   1 * time.Second,
-			BulletType: BulletSmallYellow,
-		},
-		{
-			Type: "move_to",
-			Options: map[string]interface{}{
-				"target": Vector{X: 250, Y: 100},
-				"speed":  100.0,
-				"easing": "quad",
-			},
-			Duration: 1 * time.Second,
-		},
-	},
-}
+var schedule = Schedule{}
 
 func (boss *BossOne) Start() {
 }
