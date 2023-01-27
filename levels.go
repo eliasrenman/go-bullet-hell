@@ -52,10 +52,9 @@ func (e *Event) spawnEvent() {
 	fmt.Printf("Spawning enemies: %v\n", e.Options.Enemies)
 
 	for _, options := range e.Options.Enemies {
-		println(options.Enemy)
 		enemy := LoadEnemy(options.Enemy)
-		println(enemy)
 		instance := enemy.Spawn()
+		fmt.Printf("%v spawned at %v", instance, options.Position)
 		instance.Position = options.Position
 	}
 }

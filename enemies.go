@@ -30,20 +30,18 @@ type EnemyInstance struct {
 	Health int
 }
 
-var enemyCache = make(map[string]*Enemy)
+var enemyCache = make(map[string]Enemy)
 var mutex sync.Mutex
 
-func LoadEnemy(name string) *Enemy {
-	mutex.Lock()
+func LoadEnemy(name string) Enemy {
 	if enemy, ok := enemyCache[name]; ok {
 		return enemy
 	}
-	mutex.Unlock()
 
 	meta := loadMetadata(name)
 	sprites := loadSprites(name)
 
-	enemy := &Enemy{
+	enemy := Enemy{
 		EnemyMetadata: meta,
 		Sprites:       sprites,
 	}
