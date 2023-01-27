@@ -36,9 +36,15 @@ func VectorFromMap(data map[string]float64) Vector {
 	}
 }
 
+// MagnitudeSquared returns the squared magnitude (length) of the vector
+// it is faster than Magnitude, but more limited in use
+func (vector Vector) MagnitudeSquared() float64 {
+	return vector.X*vector.X + vector.Y*vector.Y
+}
+
 // Magnitude calculates the magnitude (length) of the vector
 func (vector Vector) Magnitude() float64 {
-	return math.Sqrt(vector.X*vector.X + vector.Y*vector.Y)
+	return math.Sqrt(vector.MagnitudeSquared())
 }
 
 // Direction calculates the direction of the vector
@@ -75,6 +81,12 @@ func (vector Vector) Angle() float64 {
 func (vector Vector) Copy() Vector {
 	v := Vector{vector.X, vector.Y}
 	return v
+}
+
+// DistanceSquared calculates the squared distance between two vectors
+// it is faster than Distance, but more limited in use
+func (vector Vector) DistanceSquared(other Vector) float64 {
+	return vector.Minus(other).MagnitudeSquared()
 }
 
 // Distance calculates the distance between two vectors

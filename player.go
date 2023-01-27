@@ -85,7 +85,6 @@ func (player *Player) Update(game *Game) {
 	moveSlow := ButtonSlow.Get(0)
 	if moveInput.X != 0 || moveInput.Y != 0 {
 		if moveSlow {
-
 			speed = moveSpeedSlow
 		} else {
 			speed = moveSpeed

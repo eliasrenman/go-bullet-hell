@@ -13,6 +13,7 @@ import (
 type EnemyMetadata struct {
 	Name      string
 	MaxHealth int
+	Hitbox    map[string]any
 	Type      string
 	Schedule  Schedule
 }
@@ -23,7 +24,8 @@ type Enemy struct {
 }
 
 type EnemyInstance struct {
-	Entity
+	*Entity
+	Hitbox Collidable
 	Enemy
 	Health int
 }
@@ -67,6 +69,35 @@ func loadMetadata(name string) EnemyMetadata {
 	return meta
 }
 
+func (enemy *EnemyInstance) loadHitbox() Collidable {
+	hitboxData := enemy.EnemyMetadata.Hitbox
+
+	baseHitbox := Hitbox{
+		Owner: enemy.Entity,
+		Position: Vector{
+			X: hitboxData["x"].(float64),
+			Y: hitboxData["y"].(float64),
+		},
+	}
+
+	switch hitboxData["type"] {
+	case "circle":
+		return &CircleHitbox{
+			Hitbox: baseHitbox,
+			Radius: hitboxData["radius"].(float64),
+		}
+	case "rectangle":
+		return &RectangleHitbox{
+			Hitbox: baseHitbox,
+			Size: Vector{
+				X: hitboxData["width"].(float64),
+				Y: hitboxData["height"].(float64),
+			},
+		}
+	}
+	return nil
+}
+
 func loadSprites(path string) map[string]*Image {
 	// TODO: support spritesheets as animations
 
@@ -89,22 +120,37 @@ func (enemy *Enemy) Spawn() *EnemyInstance {
 	fmt.Printf("Spawning enemy %s\n", enemy.Name)
 
 	return Spawn(&EnemyInstance{
-		Entity: Entity{
-			Position: Vector{},
-		},
+		Entity: &Entity{},
 		Enemy:  *enemy,
 		Health: enemy.MaxHealth,
 	}, CharacterLayer)
 }
 
-func (enemy *EnemyInstance) Start() {}
+func (enemy *EnemyInstance) Start() {
+	enemy.Hitbox = enemy.loadHitbox()
+}
 
 func (enemy *EnemyInstance) Update(game *Game) {
-	enemy.Schedule.Update(&enemy.Entity)
+	enemy.Schedule.Update(enemy.Entity)
+	enemy.checkBulletCollisions()
+}
+
+func (enemy *EnemyInstance) checkBulletCollisions() {
+	EachGameObject(func(obj GameObject, layer int) {
+		bullet, ok := obj.(*Bullet)
+		if ok && bullet.Owner == GetGame().player.Entity && CollidesAt(enemy.Hitbox, enemy.Position, bullet.Hitbox, bullet.Position) {
+			enemy.TakeDamage(bullet.Damage)
+			Destroy(bullet)
+		}
+	}, BulletLayer)
 }
 
 func (enemy *EnemyInstance) Draw(screen *ebiten.Image) {
 	enemy.Sprites["idle"].Draw(screen, enemy.Position, Vector{1, 1}, 0)
+
+	if HitboxesVisible {
+		enemy.Hitbox.Draw(screen, enemy.Position)
+	}
 }
 
 func (enemy *EnemyInstance) Die() {}

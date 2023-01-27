@@ -129,7 +129,6 @@ func (entity *Entity) Shoot(position Vector, direction float64, speed float64, o
 		Owner:      entity,
 		BulletType: bulletType,
 		Damage:     damage,
-		//Collidable:     getBulletHitbox(bulletType),
 	}, 2)
 	bullet.Hitbox = getBulletHitbox(bulletType, bullet)
 	bullet.SetAngularVelocity(speed, direction)

@@ -1,7 +1,14 @@
 {
     "name": "Test Enemy",
-    "health": 10,
+    "maxHealth": 10,
     "type": "enemy",
+    "hitbox": {
+        "type": "rectangle",
+        "x": -16,
+        "y": -6,
+        "width": 32,
+        "height": 16
+    },
     "schedule": {
         "patterns": [
             {
