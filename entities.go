@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -47,7 +46,6 @@ const (
 
 // Spawn creates a new copy of a game object
 func Spawn[T GameObject](obj T, layer int) T {
-	fmt.Printf("Spawning %T\n", obj)
 	mu.Lock()
 	spawnQueue[obj] = layer
 	mu.Unlock()

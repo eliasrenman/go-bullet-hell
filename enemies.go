@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"strings"
 	"sync"
@@ -115,8 +114,6 @@ func loadSprites(path string) map[string]*Image {
 }
 
 func (enemy *Enemy) Spawn() *EnemyInstance {
-	fmt.Printf("Spawning enemy %s\n", enemy.Name)
-
 	return Spawn(&EnemyInstance{
 		Entity: &Entity{},
 		Enemy:  *enemy,
