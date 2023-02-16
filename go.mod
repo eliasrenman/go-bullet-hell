@@ -17,7 +17,7 @@ require (
 	github.com/jezek/xgb v1.0.1 // indirect
 	github.com/viterin/partial v1.0.0 // indirect
 	github.com/viterin/vek v0.4.0 // indirect
-	golang.org/x/exp v0.0.0-20221108223516-5d533826c662 // indirect
+	golang.org/x/exp v0.0.0-20230108222341-4b8118a2686a // indirect
 	golang.org/x/image v0.0.0-20220722155232-062f8c9fd539 // indirect
 	golang.org/x/mobile v0.0.0-20220722155234-aaac322e2105 // indirect
 	golang.org/x/sys v0.2.0 // indirect

@@ -24,13 +24,13 @@ type CircleHitbox struct {
 }
 
 // Draw function that will draw the CircleHitboxes borders
-func (hb *CircleHitbox) Draw(screen *ebiten.Image, position Vector) {
+func (hb CircleHitbox) Draw(screen *ebiten.Image, position Vector) {
 
 	op := &ebiten.DrawImageOptions{}
 	position.Add(hb.Position)
 	op.GeoM.Translate(position.X, position.Y)
 	if hb.image == nil {
-		hb.image = generateCircleHitboxImage(hb)
+		hb.image = generateCircleHitboxImage(&hb)
 	}
 	screen.DrawImage(hb.image, op)
 }
@@ -54,13 +54,13 @@ type RectangleHitbox struct {
 }
 
 // Draw function that will draw the RectangleHitboxes borders
-func (hb *RectangleHitbox) Draw(screen *ebiten.Image, position Vector) {
+func (hb RectangleHitbox) Draw(screen *ebiten.Image, position Vector) {
 
 	op := &ebiten.DrawImageOptions{}
 	position.Add(hb.Position)
 	op.GeoM.Translate(position.X, position.Y)
 	if hb.image == nil {
-		hb.image = generateRectHitboxImage(hb)
+		hb.image = generateRectHitboxImage(&hb)
 	}
 	screen.DrawImage(hb.image, op)
 }
@@ -102,7 +102,7 @@ func collisionRectangleCircle(a *RectangleHitbox, aPos Vector, b *CircleHitbox, 
 }
 
 func collisionCircleCircle(a *CircleHitbox, aPos Vector, b *CircleHitbox, bPos Vector) bool {
-	return aPos.Distance(bPos) < a.Radius+b.Radius
+	return aPos.DistanceSquared(bPos) < (a.Radius+b.Radius)*(a.Radius+b.Radius)
 }
 
 // CollidesAt checks if two Collidables collide at the given positions

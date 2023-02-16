@@ -104,7 +104,7 @@ Showing Hitboxes: %t, ("F2" to toggle))`,
 		debugger.startTime.Format("January 2 15:04:05"),
 		debugger.totalTime.Truncate(time.Second),
 		debugger.deltaTime.Truncate(time.Millisecond/100),
-		len(BulletObjects),
+		len(GameObjects),
 		getGraphicsLibraryName(int(debugger.graphicsLibrary)),
 		HitboxesVisible)
 

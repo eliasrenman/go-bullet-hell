@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -83,7 +85,6 @@ func (player *Player) Update(game *Game) {
 	moveSlow := ButtonSlow.Get(0)
 	if moveInput.X != 0 || moveInput.Y != 0 {
 		if moveSlow {
-
 			speed = moveSpeedSlow
 		} else {
 			speed = moveSpeed
@@ -135,18 +136,10 @@ func (player *Player) Update(game *Game) {
 }
 
 func (player *Player) checkBulletCollision() {
-	bulletsInMoveHitbox := make(map[*Bullet]struct{})
-	cleanupHitbox := &CircleHitbox{
-		Radius: float64(player.hitCleanupCounter),
-	}
-	for b := range BulletObjects {
-		bullet, ok := b.(*Bullet)
+	EachGameObject(func(obj GameObject, layer int) {
+		bullet, ok := obj.(*Bullet)
 
-		if ok && *bullet.Owner != *player.Entity {
-
-			if CollidesAt(cleanupHitbox, player.Position, bullet.Hitbox, bullet.Position) {
-				bulletsInMoveHitbox[bullet] = struct{}{}
-			}
+		if ok && bullet.Owner != player.Entity {
 			if !player.hit && CollidesAt(player.DamageHitbox, player.Position, bullet.Hitbox, bullet.Position) {
 				player.hit = true
 				player.hitCleanupCounter = 0
@@ -155,24 +148,39 @@ func (player *Player) checkBulletCollision() {
 				Destroy(bullet)
 			}
 		}
-	}
-	if player.hit {
-		for b := range bulletsInMoveHitbox {
+	}, BulletLayer)
 
-			Destroy(b)
-		}
+	if player.hit {
+		player.clearBullets(float64(player.hitCleanupCounter))
 	}
+}
+
+func (player *Player) clearBullets(maxDistance float64) {
+	EachGameObject(func(obj GameObject, layer int) {
+		bullet, ok := obj.(*Bullet)
+
+		if ok && bullet.Owner != player.Entity {
+			distanceSquared := player.Position.DistanceSquared(bullet.Position)
+			if distanceSquared > maxDistance*maxDistance {
+				// Animate the destruction of the bullet, in a circular fashion
+				go func() {
+					time.Sleep(time.Duration(distanceSquared * float64(time.Millisecond)))
+					Destroy(bullet)
+				}()
+			}
+		}
+	}, BulletLayer)
 }
 
 // Die is called when the player dies
 func (player *Player) Die() {
 	// Make sure to clean up all the players bullets
-	for obj := range BulletObjects {
+	EachGameObject(func(obj GameObject, layer int) {
 		bullet, ok := obj.(*Bullet)
-		if ok && *bullet.Entity == *player.Entity {
-			Destroy(bullet)
+		if ok && bullet.Owner == player.Entity {
+			Destroy(obj)
 		}
-	}
+	}, BulletLayer)
 }
 
 var (

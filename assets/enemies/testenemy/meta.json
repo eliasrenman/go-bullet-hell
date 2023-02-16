@@ -1,0 +1,40 @@
+{
+    "name": "Test Enemy",
+    "maxHealth": 10,
+    "type": "enemy",
+    "hitbox": {
+        "type": "rectangle",
+        "x": -16,
+        "y": -6,
+        "width": 32,
+        "height": 16
+    },
+    "schedule": {
+        "patterns": [
+            {
+                "type": "move_by",
+                "options": {
+                    "amount": {
+                        "x": 30,
+                        "y": 50
+                    },
+                    "speed": 58.3,
+                    "easing": "sine_in"
+                },
+                "duration": 1
+            },
+            {
+                "type": "move_by",
+                "options": {
+                    "amount": {
+                        "x": -30,
+                        "y": 50
+                    },
+                    "speed": 58.3,
+                    "easing": "sine_in"
+                },
+                "duration": 1
+            }
+        ]
+    }
+}

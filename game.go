@@ -14,14 +14,68 @@ type Game struct {
 
 var backgroundImage = LoadImage("bg/img1.png", OriginTopLeft)
 
+var testLevel = Level{
+	Events: []Event{
+		{
+			Type: "spawn",
+			Options: EventOptions{
+				Enemies: []EnemySpawnOptions{
+					{
+						Enemy:    "testenemy",
+						Position: Vector{X: 100, Y: -20},
+					},
+					{
+						Enemy:    "testenemy",
+						Position: Vector{X: 300, Y: -20},
+					},
+				},
+			},
+			Cooldown: 5,
+		},
+		{
+			Type: "spawn",
+			Options: EventOptions{
+				Enemies: []EnemySpawnOptions{
+					{
+						Enemy:    "testenemy",
+						Position: Vector{X: 50, Y: -20},
+					},
+					{
+						Enemy:    "testenemy",
+						Position: Vector{X: 225, Y: -20},
+					},
+					{
+						Enemy:    "testenemy",
+						Position: Vector{X: 400, Y: -20},
+					},
+				},
+			},
+			Cooldown: 5,
+		},
+		{
+			Type: "spawn",
+			Options: EventOptions{
+				Enemies: []EnemySpawnOptions{
+					{
+						Enemy:    "testenemy",
+						Position: Vector{X: 100, Y: -20},
+					},
+					{
+						Enemy:    "testenemy",
+						Position: Vector{X: 300, Y: -20},
+					},
+				},
+			},
+			Cooldown: 5,
+		},
+	},
+}
+
 // NewGame creates a new game instance
 func NewGame() *Game {
-	player := Spawn(NewPlayer(PlayerStart), CharacterQueue)
+	player := Spawn(NewPlayer(PlayerStart), 1)
 
 	SpawnHealthBar(NewGuiHealthBar(player.Health, PlayfieldSize.X+100, 250, "Player"))
-	// Spawn boss
-	bossOne := Spawn(NewBossOne(PlayfieldSize.Dot(OriginTop).Plus(Vector{Y: 100})), CharacterQueue)
-	SpawnHealthBar(NewGuiHealthBar(bossOne.Health, PlayfieldSize.X+100, 265, "Boss 1"))
 	game := Game{
 		player: player,
 		background: Background{
@@ -33,6 +87,8 @@ func NewGame() *Game {
 
 	game.debugger = NewDebugger(&game)
 
+	go testLevel.Start()
+
 	return &game
 }
 
@@ -40,22 +96,14 @@ func NewGame() *Game {
 func (game *Game) Draw(screen *ebiten.Image) {
 	// Draw background
 	game.background.Draw(gameView)
-
-	// Draw game objects
-	for obj := range BackgroundObjects {
+	EachGameObject(func(obj GameObject, layer int) {
 		obj.Draw(gameView)
-	}
-	for obj := range CharacterObjects {
-		obj.Draw(gameView)
-	}
-
-	for obj := range BulletObjects {
-		obj.Draw(gameView)
-	}
+	})
 
 	for obj := range GuiElements {
 		obj.Draw(screen)
 	}
+
 	drawGameView(screen)
 	game.debugger.Draw(screen)
 }
@@ -80,15 +128,9 @@ func (game *Game) Update() error {
 	game.background.Update()
 	game.debugger.Update()
 
-	for obj := range BackgroundObjects {
+	EachGameObject(func(obj GameObject, layer int) {
 		obj.Update(game)
-	}
-	for obj := range BulletObjects {
-		obj.Update(game)
-	}
-	for obj := range CharacterObjects {
-		obj.Update(game)
-	}
+	})
 
 	for obj := range GuiElements {
 		obj.Update()
